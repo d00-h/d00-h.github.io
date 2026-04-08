@@ -29,7 +29,6 @@
       overflow-x: hidden;
     }
 
-    /* noise grain */
     body::after {
       content: '';
       position: fixed; inset: 0; z-index: 998; pointer-events: none;
@@ -179,10 +178,6 @@
     .cl { font-size: .75rem; color: var(--muted); }
     .cv { font-size: .88rem; font-weight: 500; }
 
-    /* ══ REVEAL ══ */
-    .rv { opacity: 0; transform: translateY(28px); transition: opacity .65s ease, transform .65s ease; }
-    .rv.in { opacity: 1; transform: none; }
-
     /* ══ BLOG CATEGORIES ══ */
     #blog { flex-direction: column; align-items: flex-start; }
 
@@ -191,48 +186,32 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 20px; width: 100%;
     }
-
     .cat-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 32px 26px;
       text-decoration: none; color: inherit;
-      display: flex; flex-direction: column; gap: 14px;
-      transition: all .25s; cursor: pointer;
-      position: relative; overflow: hidden;
+      display: flex; flex-direction: column; gap: 12px;
+      transition: all .25s; position: relative; overflow: hidden;
     }
     .cat-card::before {
-      content: '';
-      position: absolute; inset: 0;
+      content: ''; position: absolute; inset: 0;
       background: linear-gradient(135deg, rgba(56,189,248,.06), transparent);
       opacity: 0; transition: opacity .25s;
     }
     .cat-card:hover { border-color: var(--cyan); transform: translateY(-5px); box-shadow: 0 16px 48px rgba(0,0,0,.4), 0 0 0 1px rgba(56,189,248,.2); }
     .cat-card:hover::before { opacity: 1; }
-
-    .cat-icon {
-      width: 52px; height: 52px; border-radius: 14px;
-      background: linear-gradient(135deg, var(--cyan2), var(--teal));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px;
-      box-shadow: 0 0 20px rgba(56,189,248,.3);
-    }
-    .cat-num {
-      font-size: .7rem; letter-spacing: 3px;
-      color: var(--cyan); text-transform: uppercase;
-    }
-    .cat-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.1rem; font-weight: 700;
-    }
+    .cat-icon { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, var(--cyan2), var(--teal)); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 20px rgba(56,189,248,.3); }
+    .cat-num { font-size: .7rem; letter-spacing: 3px; color: var(--cyan); text-transform: uppercase; }
+    .cat-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; }
     .cat-desc { font-size: .83rem; color: var(--muted); line-height: 1.65; }
-    .cat-arrow {
-      font-size: .85rem; color: var(--cyan);
-      margin-top: auto; display: flex; align-items: center; gap: 6px;
-      opacity: 0; transform: translateX(-6px); transition: all .25s;
-    }
+    .cat-arrow { font-size: .85rem; color: var(--cyan); margin-top: auto; display: flex; align-items: center; gap: 6px; opacity: 0; transform: translateX(-6px); transition: all .25s; }
     .cat-card:hover .cat-arrow { opacity: 1; transform: none; }
+
+    /* ══ REVEAL ══ */
+    .rv { opacity: 0; transform: translateY(28px); transition: opacity .65s ease, transform .65s ease; }
+    .rv.in { opacity: 1; transform: none; }
 
     /* ══ RESPONSIVE ══ */
     @media (max-width: 860px) {
@@ -259,6 +238,11 @@
     <span class="tip">Home</span>
   </a>
   <div class="nav-dot"></div>
+  <a href="#blog" data-s="blog">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span class="tip">Blog</span>
+  </a>
+  <div class="nav-dot"></div>
   <a href="#skills" data-s="skills">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
     <span class="tip">Skills</span>
@@ -273,11 +257,6 @@
     <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
     <span class="tip">Contact</span>
   </a>
-  <div class="nav-dot"></div>
-  <a href="#blog" data-s="blog">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-    <span class="tip">Blog</span>
-  </a>
 </nav>
 
 <!-- ══ HOME ══ -->
@@ -288,12 +267,6 @@
   <div class="avatar-wrap rv">
     <div class="avatar-spin"></div>
     <div class="avatar-inner">👤</div>
-    <!--
-      📌 본인 사진으로 바꾸려면 위 두 줄을 아래로 교체:
-      <div class="avatar-inner" style="padding:0">
-        <img src="photo.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:50%">
-      </div>
-    -->
   </div>
 
   <h1 class="h1 rv" style="transition-delay:.1s">Hi, I'm <em>Doha</em></h1>
@@ -313,6 +286,63 @@
   </div>
 </section>
 
+<!-- ══ BLOG CATEGORIES ══ -->
+<section id="blog">
+  <div class="g" style="width:400px;height:400px;background:radial-gradient(circle,#0369a1,transparent);top:-80px;left:-60px;"></div>
+  <div class="g" style="width:300px;height:300px;background:radial-gradient(circle,#0e7490,transparent);bottom:-60px;right:5%;"></div>
+
+  <div class="sh rv">
+    <p class="sl">write & share</p>
+    <h2 class="st">Blog <em>Categories</em></h2>
+    <p class="ss">개발, 보안, 리서치를 기록합니다.</p>
+  </div>
+
+  <div class="cat-grid">
+    <a href="#" class="cat-card rv">
+      <div class="cat-icon">⌨️</div>
+      <span class="cat-num">01</span>
+      <p class="cat-title">개발</p>
+      <p class="cat-desc">코드, 프로젝트, 개발 기록</p>
+      <span class="cat-arrow">글 보러가기 →</span>
+    </a>
+    <a href="#" class="cat-card rv" style="transition-delay:.07s">
+      <div class="cat-icon">🚩</div>
+      <span class="cat-num">02</span>
+      <p class="cat-title">CTF / Wargame</p>
+      <p class="cat-desc">문제 풀이 &amp; 라이트업</p>
+      <span class="cat-arrow">글 보러가기 →</span>
+    </a>
+    <a href="#" class="cat-card rv" style="transition-delay:.14s">
+      <div class="cat-icon">🐛</div>
+      <span class="cat-num">03</span>
+      <p class="cat-title">Bug Bounty</p>
+      <p class="cat-desc">취약점 발견 &amp; 리포트</p>
+      <span class="cat-arrow">글 보러가기 →</span>
+    </a>
+    <a href="#" class="cat-card rv" style="transition-delay:.21s">
+      <div class="cat-icon">📝</div>
+      <span class="cat-num">04</span>
+      <p class="cat-title">블로그 / 기술문서</p>
+      <p class="cat-desc">튜토리얼, 가이드, 기술 정리</p>
+      <span class="cat-arrow">글 보러가기 →</span>
+    </a>
+    <a href="#" class="cat-card rv" style="transition-delay:.28s">
+      <div class="cat-icon">📄</div>
+      <span class="cat-num">05</span>
+      <p class="cat-title">논문 / 컨퍼런스</p>
+      <p class="cat-desc">리서치, 발표, 논문 정리</p>
+      <span class="cat-arrow">글 보러가기 →</span>
+    </a>
+    <a href="#" class="cat-card rv" style="transition-delay:.35s">
+      <div class="cat-icon">🏆</div>
+      <span class="cat-num">06</span>
+      <p class="cat-title">공모전 / 자격증</p>
+      <p class="cat-desc">수상 기록 &amp; 자격증 후기</p>
+      <span class="cat-arrow">글 보러가기 →</span>
+    </a>
+  </div>
+</section>
+
 <!-- ══ SKILLS ══ -->
 <section id="skills">
   <div class="g" style="width:380px;height:380px;background:radial-gradient(circle,#0369a1,transparent);top:-80px;right:-40px;"></div>
@@ -320,7 +350,7 @@
   <div class="sh rv">
     <p class="sl">what i know</p>
     <h2 class="st">My <em>Skills</em></h2>
-    <p class="ss">사용할 수 있는 기술 스택과 도구들을 소개합니다. 여기에 설명을 추가하세요.</p>
+    <p class="ss">사용할 수 있는 기술 스택과 도구들을 소개합니다.</p>
   </div>
 
   <div class="skills-wrap">
@@ -387,33 +417,31 @@
       <div class="tl-body">
         <p class="tl-role">직책 / 역할 이름</p>
         <p class="tl-co">@ 회사 / 학교 / 팀 이름</p>
-        <p class="tl-desc">여기에 어떤 일을 했는지 적어주세요. 예: 빅데이터 파이프라인 설계 및 Hadoop 클러스터 최적화, 처리 속도 40% 향상.</p>
+        <p class="tl-desc">여기에 어떤 일을 했는지 적어주세요.</p>
         <div class="tl-tags">
           <span class="tl-tag">Hadoop</span><span class="tl-tag">Spark</span>
           <span class="tl-tag">Python</span><span class="tl-tag">AWS EMR</span>
         </div>
       </div>
     </div>
-
     <div class="tl-item rv" style="transition-delay:.12s">
       <div class="tl-year-wrap"><div class="tl-dot">2024</div></div>
       <div class="tl-body">
         <p class="tl-role">직책 / 역할 이름</p>
         <p class="tl-co">@ 회사 / 학교 / 팀 이름</p>
-        <p class="tl-desc">두 번째 경험을 여기에 적어주세요. 인턴십, 프로젝트, 수업, 수료증 등 무엇이든 괜찮아요.</p>
+        <p class="tl-desc">두 번째 경험을 여기에 적어주세요.</p>
         <div class="tl-tags">
           <span class="tl-tag">Splunk</span><span class="tl-tag">SIEM</span>
           <span class="tl-tag">Cybersecurity</span>
         </div>
       </div>
     </div>
-
     <div class="tl-item rv" style="transition-delay:.24s">
       <div class="tl-year-wrap"><div class="tl-dot">2023</div></div>
       <div class="tl-body">
         <p class="tl-role">직책 / 역할 이름</p>
         <p class="tl-co">@ 회사 / 학교 / 팀 이름</p>
-        <p class="tl-desc">세 번째 경험을 여기에 적어주세요. 학교 수업, 동아리, 개인 프로젝트 등 다양하게 넣을 수 있어요.</p>
+        <p class="tl-desc">세 번째 경험을 여기에 적어주세요.</p>
         <div class="tl-tags">
           <span class="tl-tag">HTML</span><span class="tl-tag">CSS</span>
           <span class="tl-tag">JavaScript</span><span class="tl-tag">GitHub</span>
@@ -434,15 +462,15 @@
   </div>
 
   <div class="contact-cards">
-    <a href="/cdn-cgi/l/email-protection#463f29333406232b272f2a6825292b" class="cc rv">
+    <a href="mailto:your@email.com" class="cc rv">
       <div class="ci">📧</div>
       <span class="cl">Email</span>
-      <span class="cv"><span class="__cf_email__" data-cfemail="a6dfc9d3d4e6c3cbc7cfca88c5c9cb">[email&#160;protected]</span></span>
+      <span class="cv">your@email.com</span>
     </a>
-    <a href="https://github.com/yourusername" target="_blank" class="cc rv" style="transition-delay:.1s">
+    <a href="https://github.com/d00-h" target="_blank" class="cc rv" style="transition-delay:.1s">
       <div class="ci">🐱</div>
       <span class="cl">GitHub</span>
-      <span class="cv">@yourusername</span>
+      <span class="cv">@d00-h</span>
     </a>
     <a href="https://instagram.com/yourhandle" target="_blank" class="cc rv" style="transition-delay:.2s">
       <div class="ci">📸</div>
@@ -452,66 +480,9 @@
   </div>
 </section>
 
-<!-- ══ BLOG ══ -->
-<section id="blog">
-  <div class="g" style="width:400px;height:400px;background:radial-gradient(circle,#0369a1,transparent);top:-80px;left:-60px;"></div>
-  <div class="g" style="width:300px;height:300px;background:radial-gradient(circle,#0e7490,transparent);bottom:-60px;right:5%;"></div>
-
-  <div class="sh rv">
-    <p class="sl">write & share</p>
-    <h2 class="st">Blog <em>Categories</em></h2>
-    <p class="ss">개발, 보안, 리서치를 기록합니다.</p>
-  </div>
-
-  <div class="cat-grid">
-    <a href="#" class="cat-card rv">
-      <div class="cat-icon">⌨️</div>
-      <span class="cat-num">01</span>
-      <p class="cat-title">개발</p>
-      <p class="cat-desc">코드, 프로젝트, 개발 기록</p>
-      <span class="cat-arrow">글 보러가기 →</span>
-    </a>
-    <a href="#" class="cat-card rv" style="transition-delay:.07s">
-      <div class="cat-icon">🚩</div>
-      <span class="cat-num">02</span>
-      <p class="cat-title">CTF / Wargame</p>
-      <p class="cat-desc">문제 풀이 & 라이트업</p>
-      <span class="cat-arrow">글 보러가기 →</span>
-    </a>
-    <a href="#" class="cat-card rv" style="transition-delay:.14s">
-      <div class="cat-icon">🐛</div>
-      <span class="cat-num">03</span>
-      <p class="cat-title">Bug Bounty</p>
-      <p class="cat-desc">취약점 발견 & 리포트</p>
-      <span class="cat-arrow">글 보러가기 →</span>
-    </a>
-    <a href="#" class="cat-card rv" style="transition-delay:.21s">
-      <div class="cat-icon">📝</div>
-      <span class="cat-num">04</span>
-      <p class="cat-title">블로그 / 기술문서</p>
-      <p class="cat-desc">튜토리얼, 가이드, 기술 정리</p>
-      <span class="cat-arrow">글 보러가기 →</span>
-    </a>
-    <a href="#" class="cat-card rv" style="transition-delay:.28s">
-      <div class="cat-icon">📄</div>
-      <span class="cat-num">05</span>
-      <p class="cat-title">논문 / 컨퍼런스</p>
-      <p class="cat-desc">리서치, 발표, 논문 정리</p>
-      <span class="cat-arrow">글 보러가기 →</span>
-    </a>
-    <a href="#" class="cat-card rv" style="transition-delay:.35s">
-      <div class="cat-icon">🏆</div>
-      <span class="cat-num">06</span>
-      <p class="cat-title">공모전 / 자격증</p>
-      <p class="cat-desc">수상 기록 & 자격증 후기</p>
-      <span class="cat-arrow">글 보러가기 →</span>
-    </a>
-  </div>
-</section>
-
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 /* typewriter */
-const words = ['Developer 👩‍💻', 'Big Data Engineer ☁️', 'Problem Solver 🔍', 'Creator ✨'];
+const words = ['Developer 👩‍💻', 'Security Engineer 🔒', 'Problem Solver 🔍', 'Creator ✨'];
 let wi = 0, ci = 0, del = false;
 const el = document.getElementById('typed');
 function tick() {
@@ -535,8 +506,15 @@ const io = new IntersectionObserver(entries => {
 document.querySelectorAll('.rv').forEach(el => io.observe(el));
 
 /* active nav */
-const secs = ['home','skills','experience','contact','blog'];
+const secs = ['home','blog','skills','experience','contact'];
 const links = document.querySelectorAll('.nav a[data-s]');
 const so = new IntersectionObserver(entries => {
   entries.forEach(e => {
-    if (e.isInte
+    if (e.isIntersecting)
+      links.forEach(a => a.classList.toggle('on', a.dataset.s === e.target.id));
+  });
+}, { threshold: 0.45 });
+secs.forEach(id => { const s = document.getElementById(id); if(s) so.observe(s); });
+</script>
+</body>
+</html>
