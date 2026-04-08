@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doha — Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #070d1a;
+      --card:   #0d1629;
+      --card2:  #111e35;
+      --border: rgba(56,189,248,0.13);
+      --cyan:   #38bdf8;
+      --cyan2:  #0ea5e9;
+      --teal:   #22d3ee;
+      --white:  #e8f4fd;
+      --muted:  #7a99b8;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* noise grain */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 998; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    }
+
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-thumb { background: var(--cyan2); border-radius: 99px; }
+
+    /* ══ SIDE NAV ══ */
+    .nav {
+      position: fixed; left: 14px; top: 50%;
+      transform: translateY(-50%);
+      z-index: 200;
+      background: rgba(10,18,36,0.82);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 36px;
+      padding: 18px 10px;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .nav a {
+      width: 38px; height: 38px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; color: var(--muted);
+      text-decoration: none; transition: all .22s; position: relative;
+    }
+    .nav a svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .nav a:hover, .nav a.on {
+      background: linear-gradient(135deg, var(--cyan2), var(--teal));
+      color: #fff; box-shadow: 0 0 18px rgba(56,189,248,.45);
+    }
+    .nav a .tip {
+      position: absolute; left: calc(100% + 10px);
+      background: var(--card2); border: 1px solid var(--border);
+      color: var(--white); font-size: 11px; font-family: 'DM Sans', sans-serif;
+      padding: 4px 10px; border-radius: 7px; white-space: nowrap;
+      opacity: 0; pointer-events: none; transition: opacity .18s;
+    }
+    .nav a:hover .tip { opacity: 1; }
+    .nav-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--border); margin: 2px 0; }
+
+    /* ══ SECTIONS ══ */
+    section {
+      min-height: 100vh; padding: 0 80px 0 110px;
+      display: flex; align-items: center;
+      position: relative; overflow: hidden;
+    }
+    .g { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; opacity: .28; }
+
+    /* ══ HOME ══ */
+    #home { justify-content: center; flex-direction: column; text-align: center; gap: 26px; }
+
+    .avatar-wrap { position: relative; width: 118px; height: 118px; margin: 0 auto; }
+    .avatar-spin {
+      position: absolute; inset: -3px; border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--cyan), var(--teal), transparent 60%, var(--cyan));
+      animation: spin 3.5s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .avatar-inner {
+      position: absolute; inset: 3px; border-radius: 50%;
+      background: var(--card); border: 3px solid var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 50px; overflow: hidden; z-index: 1;
+    }
+
+    .h1 { font-family: 'Syne', sans-serif; font-size: clamp(2.6rem,6vw,4.4rem); font-weight: 800; line-height: 1.08; letter-spacing: -1.5px; }
+    .h1 em { color: var(--cyan); font-style: normal; }
+
+    .typer { font-size: clamp(1rem,2.2vw,1.25rem); color: var(--teal); letter-spacing: 2.5px; min-height: 1.6em; }
+    .cur { animation: blink .75s step-end infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .subdesc { color: var(--muted); font-size: .97rem; line-height: 1.85; max-width: 500px; margin: 0 auto; }
+
+    .btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn { padding: 12px 30px; border-radius: 50px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: .92rem; font-weight: 500; text-decoration: none; transition: all .22s; display: inline-flex; align-items: center; gap: 7px; }
+    .btn-p { background: linear-gradient(135deg, var(--cyan2), var(--teal)); color: #fff; border: none; box-shadow: 0 0 22px rgba(56,189,248,.32); }
+    .btn-p:hover { box-shadow: 0 0 40px rgba(56,189,248,.6); transform: translateY(-2px); }
+    .btn-o { background: transparent; border: 1.5px solid var(--border); color: var(--white); }
+    .btn-o:hover { border-color: var(--cyan); color: var(--cyan); transform: translateY(-2px); }
+
+    /* ══ SEC HEADER ══ */
+    .sh { margin-bottom: 50px; }
+    .sl { font-size: .72rem; letter-spacing: 4px; color: var(--cyan); text-transform: uppercase; margin-bottom: 10px; }
+    .st { font-family: 'Syne', sans-serif; font-size: clamp(2rem,3.8vw,2.9rem); font-weight: 800; }
+    .st em { color: var(--cyan); font-style: normal; }
+    .ss { color: var(--muted); margin-top: 10px; font-size: .93rem; line-height: 1.75; max-width: 500px; }
+
+    /* ══ SKILLS ══ */
+    #skills { flex-direction: column; align-items: flex-start; }
+    .skills-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; width: 100%; align-items: center; }
+
+    .orbit { position: relative; width: 320px; height: 320px; display: flex; align-items: center; justify-content: center; }
+    .ring { position: absolute; border-radius: 50%; border: 1px dashed rgba(56,189,248,.18); }
+    .ring1 { width: 180px; height: 180px; animation: orb 9s linear infinite; }
+    .ring2 { width: 290px; height: 290px; animation: orb 15s linear infinite reverse; }
+    @keyframes orb { to { transform: rotate(360deg); } }
+    .oi { position: absolute; width: 46px; height: 46px; border-radius: 14px; background: var(--card2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 20px rgba(0,0,0,.5); }
+    .r1a { top: 0; left: 50%; transform: translate(-50%,-50%); }
+    .r1b { bottom: 0; left: 50%; transform: translate(-50%,50%); }
+    .r2a { top: 50%; right: 0; transform: translate(50%,-50%); }
+    .r2b { top: 50%; left: 0; transform: translate(-50%,-50%); }
+    .r2c { top: 10%; left: 10%; transform: translate(-50%,-50%); }
+    .ocenter { width: 88px; height: 88px; border-radius: 50%; background: linear-gradient(135deg, var(--cyan2), var(--teal)); display: flex; align-items: center; justify-content: center; font-size: 36px; box-shadow: 0 0 44px rgba(56,189,248,.5); z-index: 2; }
+
+    .bars { display: flex; flex-direction: column; gap: 20px; }
+    .bar-meta { display: flex; justify-content: space-between; font-size: .88rem; margin-bottom: 7px; }
+    .bar-meta span:first-child { color: var(--white); display: flex; align-items: center; gap: 9px; }
+    .bar-meta span:last-child { color: var(--cyan); font-weight: 500; }
+    .track { height: 5px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; }
+    .fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--cyan2), var(--teal)); box-shadow: 0 0 10px rgba(56,189,248,.5); width: 0; transition: width 1.3s cubic-bezier(.4,0,.2,1); }
+
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+    .badge { padding: 6px 14px; border-radius: 99px; font-size: .78rem; border: 1px solid var(--border); color: var(--cyan); background: rgba(56,189,248,.06); }
+
+    /* ══ EXPERIENCE ══ */
+    #experience { flex-direction: column; align-items: flex-start; }
+
+    .timeline { width: 100%; display: flex; flex-direction: column; }
+    .tl-item { display: grid; grid-template-columns: 80px 1fr; position: relative; }
+    .tl-item:not(:last-child)::after {
+      content: ''; position: absolute;
+      left: 39px; top: 54px; bottom: 0;
+      width: 1px; background: linear-gradient(to bottom, rgba(56,189,248,.4), transparent);
+    }
+    .tl-year-wrap { display: flex; flex-direction: column; align-items: center; padding-top: 14px; }
+    .tl-dot { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--cyan2), var(--teal)); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: .72rem; font-weight: 700; box-shadow: 0 0 18px rgba(56,189,248,.4); flex-shrink: 0; }
+    .tl-body { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px 28px; margin: 8px 0 32px 20px; transition: border-color .22s, box-shadow .22s; }
+    .tl-body:hover { border-color: var(--cyan); box-shadow: 0 0 30px rgba(56,189,248,.12); }
+    .tl-role { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; }
+    .tl-co { color: var(--cyan); font-size: .87rem; margin: 4px 0 10px; }
+    .tl-desc { color: var(--muted); font-size: .88rem; line-height: 1.75; }
+    .tl-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+    .tl-tag { font-size: .73rem; padding: 3px 10px; border-radius: 99px; border: 1px solid var(--border); color: var(--teal); background: rgba(34,211,238,.06); }
+
+    /* ══ CONTACT ══ */
+    #contact { flex-direction: column; align-items: center; text-align: center; }
+    #contact .sh { text-align: center; }
+    #contact .sh .ss { margin: 10px auto 0; }
+
+    .contact-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 100%; max-width: 680px; margin-top: 44px; }
+    .cc { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 30px 18px; text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 12px; transition: all .22s; }
+    .cc:hover { border-color: var(--cyan); box-shadow: 0 0 32px rgba(56,189,248,.18); transform: translateY(-5px); }
+    .ci { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, var(--cyan2), var(--teal)); display: flex; align-items: center; justify-content: center; font-size: 23px; box-shadow: 0 0 22px rgba(56,189,248,.35); }
+    .cl { font-size: .75rem; color: var(--muted); }
+    .cv { font-size: .88rem; font-weight: 500; }
+
+    /* ══ REVEAL ══ */
+    .rv { opacity: 0; transform: translateY(28px); transition: opacity .65s ease, transform .65s ease; }
+    .rv.in { opacity: 1; transform: none; }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 860px) {
+      section { padding: 80px 30px 80px 80px; }
+      .skills-wrap { grid-template-columns: 1fr; }
+      .orbit { display: none; }
+      .contact-cards { grid-template-columns: 1fr 1fr; max-width: 420px; }
+    }
+    @media (max-width: 560px) {
+      section { padding: 70px 16px 70px 66px; }
+      .nav { left: 6px; }
+      .contact-cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ SIDE NAV ══ -->
+<nav class="nav" id="nav">
+  <a href="#home" class="on" data-s="home">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span class="tip">Home</span>
+  </a>
+  <div class="nav-dot"></div>
+  <a href="#skills" data-s="skills">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+    <span class="tip">Skills</span>
+  </a>
+  <div class="nav-dot"></div>
+  <a href="#experience" data-s="experience">
+    <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+    <span class="tip">Experience</span>
+  </a>
+  <div class="nav-dot"></div>
+  <a href="#contact" data-s="contact">
+    <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    <span class="tip">Contact</span>
+  </a>
+</nav>
+
+<!-- ══ HOME ══ -->
+<section id="home">
+  <div class="g" style="width:500px;height:500px;background:radial-gradient(circle,#0369a1,transparent);top:-120px;right:-60px;"></div>
+  <div class="g" style="width:300px;height:300px;background:radial-gradient(circle,#0e7490,transparent);bottom:-60px;left:8%;"></div>
+
+  <div class="avatar-wrap rv">
+    <div class="avatar-spin"></div>
+    <div class="avatar-inner">👤</div>
+    <!--
+      📌 본인 사진으로 바꾸려면 위 두 줄을 아래로 교체:
+      <div class="avatar-inner" style="padding:0">
+        <img src="photo.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:50%">
+      </div>
+    -->
+  </div>
+
+  <h1 class="h1 rv" style="transition-delay:.1s">Hi, I'm <em>Doha</em></h1>
+
+  <p class="typer rv" style="transition-delay:.18s">
+    <span id="typed"></span><span class="cur">|</span>
+  </p>
+
+  <p class="subdesc rv" style="transition-delay:.26s">
+    여기에 자기소개를 써보세요.<br>
+    어떤 일을 하는지, 어떤 것에 관심 있는지 2~3줄로 적어주면 돼요.
+  </p>
+
+  <div class="btns rv" style="transition-delay:.34s">
+    <a href="#experience" class="btn btn-p">✦ My Experience</a>
+    <a href="#contact" class="btn btn-o">Contact Me →</a>
+  </div>
+</section>
+
+<!-- ══ SKILLS ══ -->
+<section id="skills">
+  <div class="g" style="width:380px;height:380px;background:radial-gradient(circle,#0369a1,transparent);top:-80px;right:-40px;"></div>
+
+  <div class="sh rv">
+    <p class="sl">what i know</p>
+    <h2 class="st">My <em>Skills</em></h2>
+    <p class="ss">사용할 수 있는 기술 스택과 도구들을 소개합니다. 여기에 설명을 추가하세요.</p>
+  </div>
+
+  <div class="skills-wrap">
+    <div class="orbit rv" style="transition-delay:.15s">
+      <div class="ring ring1">
+        <div class="oi r1a">⚡</div>
+        <div class="oi r1b">🎨</div>
+      </div>
+      <div class="ring ring2">
+        <div class="oi r2a">☁️</div>
+        <div class="oi r2b">🔒</div>
+        <div class="oi r2c">🐍</div>
+      </div>
+      <div class="ocenter">💻</div>
+    </div>
+
+    <div class="rv" style="transition-delay:.2s">
+      <div class="bars">
+        <div class="bar-row">
+          <div class="bar-meta"><span>⚛️ &nbsp;HTML / CSS / JS</span><span>90%</span></div>
+          <div class="track"><div class="fill" data-w="90"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-meta"><span>🐍 &nbsp;Python</span><span>80%</span></div>
+          <div class="track"><div class="fill" data-w="80"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-meta"><span>🐘 &nbsp;Hadoop / Spark</span><span>75%</span></div>
+          <div class="track"><div class="fill" data-w="75"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-meta"><span>☁️ &nbsp;AWS / Azure</span><span>72%</span></div>
+          <div class="track"><div class="fill" data-w="72"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-meta"><span>🔒 &nbsp;Cybersecurity / Splunk</span><span>68%</span></div>
+          <div class="track"><div class="fill" data-w="68"></div></div>
+        </div>
+      </div>
+      <div class="badges">
+        <span class="badge">Git</span><span class="badge">Linux</span>
+        <span class="badge">MySQL</span><span class="badge">Docker</span>
+        <span class="badge">Figma</span><span class="badge">Notion</span>
+        <span class="badge">HDFS</span><span class="badge">YARN</span>
+        <span class="badge">MapReduce</span><span class="badge">Splunk</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ EXPERIENCE ══ -->
+<section id="experience">
+  <div class="g" style="width:320px;height:320px;background:radial-gradient(circle,#0e7490,transparent);bottom:-60px;right:5%;"></div>
+
+  <div class="sh rv">
+    <p class="sl">my journey</p>
+    <h2 class="st">Experi<em>ence</em></h2>
+    <p class="ss">지금까지의 경험과 활동들을 소개합니다.</p>
+  </div>
+
+  <div class="timeline">
+    <div class="tl-item rv">
+      <div class="tl-year-wrap"><div class="tl-dot">2025</div></div>
+      <div class="tl-body">
+        <p class="tl-role">직책 / 역할 이름</p>
+        <p class="tl-co">@ 회사 / 학교 / 팀 이름</p>
+        <p class="tl-desc">여기에 어떤 일을 했는지 적어주세요. 예: 빅데이터 파이프라인 설계 및 Hadoop 클러스터 최적화, 처리 속도 40% 향상.</p>
+        <div class="tl-tags">
+          <span class="tl-tag">Hadoop</span><span class="tl-tag">Spark</span>
+          <span class="tl-tag">Python</span><span class="tl-tag">AWS EMR</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item rv" style="transition-delay:.12s">
+      <div class="tl-year-wrap"><div class="tl-dot">2024</div></div>
+      <div class="tl-body">
+        <p class="tl-role">직책 / 역할 이름</p>
+        <p class="tl-co">@ 회사 / 학교 / 팀 이름</p>
+        <p class="tl-desc">두 번째 경험을 여기에 적어주세요. 인턴십, 프로젝트, 수업, 수료증 등 무엇이든 괜찮아요.</p>
+        <div class="tl-tags">
+          <span class="tl-tag">Splunk</span><span class="tl-tag">SIEM</span>
+          <span class="tl-tag">Cybersecurity</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item rv" style="transition-delay:.24s">
+      <div class="tl-year-wrap"><div class="tl-dot">2023</div></div>
+      <div class="tl-body">
+        <p class="tl-role">직책 / 역할 이름</p>
+        <p class="tl-co">@ 회사 / 학교 / 팀 이름</p>
+        <p class="tl-desc">세 번째 경험을 여기에 적어주세요. 학교 수업, 동아리, 개인 프로젝트 등 다양하게 넣을 수 있어요.</p>
+        <div class="tl-tags">
+          <span class="tl-tag">HTML</span><span class="tl-tag">CSS</span>
+          <span class="tl-tag">JavaScript</span><span class="tl-tag">GitHub</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CONTACT ══ -->
+<section id="contact">
+  <div class="g" style="width:450px;height:450px;background:radial-gradient(circle,#0369a1,transparent);bottom:-120px;left:50%;transform:translateX(-50%);"></div>
+
+  <div class="sh rv">
+    <p class="sl">get in touch</p>
+    <h2 class="st">Contact <em>Me</em></h2>
+    <p class="ss">언제든지 연락 주세요! 함께 멋진 걸 만들어봐요 🙌</p>
+  </div>
+
+  <div class="contact-cards">
+    <a href="mailto:your@email.com" class="cc rv">
+      <div class="ci">📧</div>
+      <span class="cl">Email</span>
+      <span class="cv">your@email.com</span>
+    </a>
+    <a href="https://github.com/yourusername" target="_blank" class="cc rv" style="transition-delay:.1s">
+      <div class="ci">🐱</div>
+      <span class="cl">GitHub</span>
+      <span class="cv">@yourusername</span>
+    </a>
+    <a href="https://instagram.com/yourhandle" target="_blank" class="cc rv" style="transition-delay:.2s">
+      <div class="ci">📸</div>
+      <span class="cl">Instagram</span>
+      <span class="cv">@yourhandle</span>
+    </a>
+  </div>
+</section>
+
+<script>
+/* typewriter */
+const words = ['Developer 👩‍💻', 'Big Data Engineer ☁️', 'Problem Solver 🔍', 'Creator ✨'];
+let wi = 0, ci = 0, del = false;
+const el = document.getElementById('typed');
+function tick() {
+  const w = words[wi];
+  el.textContent = del ? w.slice(0,--ci) : w.slice(0,++ci);
+  if (!del && ci === w.length) { del = true; setTimeout(tick, 1500); return; }
+  if (del && ci === 0) { del = false; wi = (wi+1) % words.length; }
+  setTimeout(tick, del ? 45 : 85);
+}
+tick();
+
+/* scroll reveal + bar animation */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('in');
+      e.target.querySelectorAll('.fill').forEach(b => b.style.width = b.dataset.w + '%');
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+/* active nav */
+const secs = ['home','skills','experience','contact'];
+const links = document.querySelectorAll('.nav a[data-s]');
+const so = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting)
+      links.forEach(a => a.classList.toggle('on', a.dataset.s === e.target.id));
+  });
+}, { threshold: 0.45 });
+secs.forEach(id => { const s = document.getElementById(id); if(s) so.observe(s); });
+</script>
+</body>
+</html>
