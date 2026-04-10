@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>보안 전문가 로드맵 — d00-h</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #070d1a; --card: #0d1629; --card2: #111e35;
+      --border: rgba(56,189,248,0.13); --cyan: #38bdf8;
+      --cyan2: #0ea5e9; --teal: #22d3ee; --white: #e8f4fd; --muted: #7a99b8;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; }
+    body::after { content: ''; position: fixed; inset: 0; z-index: 998; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E"); }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-thumb { background: var(--cyan2); border-radius: 99px; }
+
+    /* HEADER */
+    .header {
+      padding: 28px 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(7,13,26,0.88); backdrop-filter: blur(20px);
+    }
+    .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; text-decoration: none; color: var(--white); }
+    .logo span { color: var(--cyan); }
+    .back { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--muted); font-size: .9rem; transition: color .2s; }
+    .back:hover { color: var(--cyan); }
+    .back svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    /* HERO */
+    .hero {
+      padding: 70px 60px 50px;
+      position: relative; overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+    .g { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; opacity: .22; }
+    .post-cat { font-size: .72rem; letter-spacing: 4px; color: var(--cyan); text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .post-cat::before { content: ''; width: 24px; height: 1px; background: var(--cyan); }
+    .post-title { font-family: 'Syne', sans-serif; font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800; line-height: 1.15; max-width: 700px; }
+    .post-title em { color: var(--cyan); font-style: normal; }
+    .post-meta { display: flex; align-items: center; gap: 20px; margin-top: 24px; flex-wrap: wrap; }
+    .post-date { font-size: .82rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+    .post-date svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .post-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .post-tag { font-size: .73rem; padding: 4px 12px; border-radius: 99px; border: 1px solid var(--border); color: var(--teal); background: rgba(34,211,238,.06); }
+
+    /* CONTENT */
+    .content { max-width: 760px; margin: 0 auto; padding: 60px 60px 100px; }
+
+    .intro {
+      font-size: 1.05rem; color: var(--muted); line-height: 1.9;
+      padding: 24px 28px; border-left: 3px solid var(--cyan);
+      background: rgba(56,189,248,.04); border-radius: 0 12px 12px 0;
+      margin-bottom: 52px;
+    }
+
+    .section { margin-bottom: 44px; }
+
+    .section-header {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 20px;
+    }
+    .section-icon {
+      width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--cyan2), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; box-shadow: 0 0 18px rgba(56,189,248,.3);
+    }
+    .section-title { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 700; }
+
+    .section-body {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px 28px;
+      font-size: .95rem; color: var(--muted); line-height: 1.85;
+    }
+    .section-body strong { color: var(--white); font-weight: 500; }
+
+    /* RESPONSIVE */
+    @media (max-width: 700px) {
+      .header { padding: 20px 24px; }
+      .hero { padding: 50px 24px 36px; }
+      .content { padding: 40px 24px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a href="/" class="logo">d00<span>-h</span></a>
+  <a href="/blog/" class="back">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    블로그로
+  </a>
+</header>
+
+<section class="hero">
+  <div class="g" style="width:400px;height:400px;background:radial-gradient(circle,#0369a1,transparent);top:-100px;right:-60px;"></div>
+  <div class="g" style="width:250px;height:250px;background:radial-gradient(circle,#0e7490,transparent);bottom:-60px;left:10%;"></div>
+
+  <p class="post-cat">블로그 / 기술문서</p>
+  <h1 class="post-title">보안 전문가가 되기 위한 <em>로드맵</em></h1>
+  <div class="post-meta">
+    <span class="post-date">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      2026. 04. 09
+    </span>
+    <div class="post-tags">
+      <span class="post-tag">로드맵</span>
+      <span class="post-tag">보안</span>
+      <span class="post-tag">자격증</span>
+      <span class="post-tag">CTF</span>
+    </div>
+  </div>
+</section>
+
+<article class="content">
+  <p class="intro">
+    아직 보안 공부를 본격적으로 시작하지 않은 상태라, 앞으로 어떻게 공부할지 로드맵을 미리 구성해보았습니다.
+  </p>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">📚</div>
+      <h2 class="section-title">학업</h2>
+    </div>
+    <div class="section-body">
+      이번 학기 전공 수업을 충실히 들으며 기초를 탄탄히 쌓을 예정입니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🏅</div>
+      <h2 class="section-title">자격증</h2>
+    </div>
+    <div class="section-body">
+      전공 수업 내용과 연계되는 <strong>SQL 자격증</strong>에 먼저 도전하고, 이후 <strong>정보보안기사</strong> 취득을 목표로 준비할 계획입니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🚩</div>
+      <h2 class="section-title">대회 & 동아리 활동</h2>
+    </div>
+    <div class="section-body">
+      동아리 활동을 통해 <strong>CTF 해킹 대회</strong> 등 다양한 공모전과 대회에 참여해볼 생각입니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">💻</div>
+      <h2 class="section-title">개인 프로젝트</h2>
+    </div>
+    <div class="section-body">
+      배운 내용을 직접 적용해볼 수 있는 <strong>개인 프로젝트</strong>도 준비할 예정입니다.
+    </div>
+  </div>
+</article>
+
+</body>
+</html>
