@@ -50,12 +50,14 @@
     .content { max-width: 760px; margin: 0 auto; padding: 60px 60px 100px; }
 
     .intro {
-      font-size: 1.05rem; color: var(--muted); line-height: 1.9;
-      padding: 24px 28px; border-left: 3px solid var(--cyan);
+      font-size: .95rem; color: var(--muted); line-height: 1.9;
+      padding: 20px 24px; border-left: 3px solid var(--cyan);
       background: rgba(56,189,248,.04); border-radius: 0 12px 12px 0;
       margin-bottom: 52px;
     }
     .intro strong { color: var(--white); font-weight: 500; }
+    .intro a { color: var(--cyan); text-decoration: none; border-bottom: 1px solid rgba(56,189,248,.4); transition: opacity .2s; }
+    .intro a:hover { opacity: .75; }
 
     .section { margin-bottom: 44px; }
     .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
@@ -110,15 +112,6 @@
     tr.hl td { color: var(--white); background: rgba(56,189,248,.05); }
     tr.hl td:first-child { color: var(--cyan); }
 
-    .risk {
-      display: inline-block; font-size: .72rem;
-      padding: 2px 9px; border-radius: 99px; margin-left: 6px;
-      border: 1px solid rgba(56,189,248,.3); color: var(--teal);
-      vertical-align: middle;
-    }
-    .risk-4 { border-color: rgba(251,146,60,.4); color: #fdba74; }
-    .risk-5 { border-color: rgba(239,68,68,.5); color: #fca5a5; }
-
     @media (max-width: 700px) {
       .header { padding: 20px 24px; }
       .hero { padding: 50px 24px 36px; }
@@ -162,9 +155,8 @@
   <p class="intro">
     <strong>논문:</strong> Automating Function-Level TARA for Automotive Full-Lifecycle Security<br />
     <strong>학회:</strong> NDSS Symposium 2026 &nbsp;|&nbsp;
-    <strong>저자:</strong> Yuqiao Yang, Yongzhao Zhang (UESTC) 외 / GoGoByte Technology
-    <strong>원문:</strong> <a href="https://www.ndss-symposium.org/ndss-paper/automating-function-level-tara-for-automotive-full-lifecycle-security/" target="_blank" style="color: var(--cyan); text-decoration: none; border-bottom: 1px solid rgba(56,189,248,0.4);">NDSS 2026 논문 페이지 →</a>
-</p>
+    <strong>저자:</strong> Yuqiao Yang, Yongzhao Zhang (UESTC) 외 / GoGoByte Technology<br />
+    <strong>원문:</strong> <a href="https://www.ndss-symposium.org/ndss-paper/automating-function-level-tara-for-automotive-full-lifecycle-security/" target="_blank">NDSS 2026 논문 페이지 →</a>
   </p>
 
   <div class="section">
@@ -187,16 +179,13 @@
     </div>
     <div class="section-body">
       <h3>연구 배경</h3>
-      <p>현재 자동차 산업은 자율주행, V2X, OTA 업데이트, ADAS 등 다양한 기술들을 통합하면서 지능형 네트워크 차량을 향해 빠르게 발전하고 있다. ECU의 수와 차량 내 네트워크의 복잡성도 증가하고 있어, 광대한 사이버 위협 환경이 형성될 가능성도 커졌다.</p>
-      <p>이러한 공격 표면의 확대에 대응하기 위해 <strong>TARA(위협 분석 및 위험 평가)</strong>가 자동차 사이버보안의 핵심 요소가 되었다. ISO/SAE 21434, WP29 R155e 같은 국제 규제는 차량 생애주기 전반에 걸친 TARA 수행을 OEM과 부품 공급업체에 의무화하고 있다.</p>
-      <p>문제는 현재 TARA가 여전히 <strong>수동으로 진행</strong>되고 있다는 점이다. 그렇다면 <strong>TARA를 LLM 모델을 이용해서 자동화하면 이 문제를 해결할 수 있을까?</strong> 이 논문이 다루는 핵심 질문이다.</p>
+      <p>현재 자동차 산업은 자율주행, OTA(Over-The-Air), V2X, ADAS 등 다양한 기술을 통합하며 지능형 네트워크 차량으로 빠르게 발전하고 있다. 하지만 이러한 발전은 차량 내부 네트워크와 ECU 간 연결 구조를 더욱 복잡하게 만들고 있으며, 결과적으로 사이버 공격 표면 또한 크게 증가시키고 있다.</p>
+      <p>이러한 공격 표면의 확대에 따라 <strong>TARA(위협 분석 및 위험 평가)</strong>는 자동차 사이버보안의 핵심 요소가 되었지만, 현재 대부분의 TARA는 여전히 수동으로 수행되고 있다. 따라서 분석 과정에 많은 시간과 인력이 필요하며, 차량 구조가 복잡해질수록 확장성이 떨어진다는 문제가 존재한다.</p>
+      <p>논문은 이러한 문제를 해결하기 위해 <strong>LLM 기반 자동화를 적용하면 함수 레벨 TARA를 효율적으로 수행할 수 있는지</strong>에 대해 다루고 있다.</p>
       <h3>기존 방식의 한계</h3>
-      <p>기존 데이터로그 기반 접근 방식들(SAHARA, EVITA, MulVal, CarVal)은 세 가지 한계가 있다.</p>
-      <ul>
-        <li><strong>차량 레벨에 머문다.</strong> 소프트웨어 버전 하나 차이로 공격 벡터가 완전히 달라지는데, 기존 방식은 이 차이를 잡아내지 못한다.</li>
-        <li><strong>컴포넌트별 위협 분석의 정밀함이 부족하다.</strong> 개별 ECU의 하드웨어 구성, 소프트웨어 버전, 통신 채널, 인터페이스 단위의 세밀한 분석을 커버하지 못한다.</li>
-        <li><strong>새로운 공격 표면에 적응하지 못한다.</strong> 새로운 기술이 도입될 때마다 라이브러리를 수동으로 업데이트해야 한다는 노동집약적인 문제가 있다.</li>
-      </ul>
+      <p>기존 데이터로그 기반 접근 방식은 주로 차량 전체 레벨(vehicle-level)의 평가에 초점을 맞추고 있다. 하지만 ISO/SAE 21434에서 요구하는 것은 함수 레벨(function-level)의 세밀한 분석이며, 기존 방식은 이 부분에서 큰 한계를 가진다.</p>
+      <p>즉, 차량 전체 수준에서는 공격 흐름을 볼 수 있지만 실제 ECU, 통신 인터페이스, 소프트웨어 버전, 하드웨어 구성 등 컴포넌트 단위의 세밀한 위협 분석은 어렵다.</p>
+      <p>또한 기존 방식은 정적인 위협 라이브러리에 의존하기 때문에 새로운 공격 기법이나 새로운 기술이 등장할 때마다 사람이 직접 라이브러리를 업데이트해야 한다. 결과적으로 <strong>노동집약적이며 빠르게 변화하는 자동차 보안 환경에 적응하기 어렵다.</strong></p>
     </div>
   </div>
 
@@ -206,12 +195,15 @@
       <h2 class="section-title">핵심 아이디어</h2>
     </div>
     <div class="section-body">
-      <p>저자들이 제안한 핵심 아이디어는 정적 위협 라이브러리 대신 <strong>LLM의 추론 능력을 위협 라이브러리로 활용하자</strong>는 것이다. 컴포넌트의 소프트웨어 버전, 하드웨어 구성, 통신 채널 정보를 입력으로 주면 LLM이 그에 맞는 공격 경로를 동적으로 생성한다. 이를 구현한 시스템이 <strong>DefenseWeaver</strong>다.</p>
+      <p>논문은 컴포넌트별 세부 정보와 LLM을 활용하여 함수 레벨 TARA를 자동화하는 시스템인 <strong>DefenseWeaver</strong>를 제안한다.</p>
+      <p>DefenseWeaver는 최소한의 수동 입력만으로 공격 트리 생성과 위험도 평가를 수행하여 보안 분석가의 업무 부담을 크게 줄인다. 또한 함수 레벨 단위의 세밀한 분석을 가능하게 하여 기존 방식보다 효율성, 정확성, 확장성을 향상시킨다.</p>
       <ul>
-        <li><strong>OpenXSAM++</strong>: LLM이 자동차 구성 정보를 효과적으로 해석할 수 있도록 하는 구조화된 기계 가독 형식</li>
-        <li><strong>멀티 에이전트 LLM 프레임워크</strong>: TARA를 자동화하는 설계로, 적응성과 견고성을 위해 LoRA 및 RAG로 강화</li>
-        <li><strong>실제 검증</strong>: 4개의 자동차 프로젝트에서 11개의 실제 공격 경로 발견 및 패치 완료</li>
+        <li><strong>OpenXSAM++ 기반 구조화 표현:</strong> LLM이 자동차 구성 정보를 효과적으로 해석할 수 있도록 하는 구조화된 기계 가독 형식</li>
+        <li><strong>멀티 에이전트 기반 LLM 프레임워크</strong></li>
+        <li><strong>LoRA 파인튜닝 및 RAG 기반 적응 구조</strong></li>
+        <li><strong>공격 트리 자동 생성 및 위험도 평가:</strong> 4개의 자동차 프로젝트에서 11개의 실제 공격 경로 발견 및 패치 완료</li>
       </ul>
+      <p>특히 기존의 정적 위협 라이브러리 기반 방식과 달리, <strong>LLM이 차량 구성 정보를 기반으로 동적으로 공격 방법을 추론</strong>한다는 점이 가장 큰 특징이다.</p>
     </div>
   </div>
 
@@ -221,6 +213,7 @@
       <h2 class="section-title">방법론 / 시스템 설명</h2>
     </div>
     <div class="section-body">
+      <p>논문에서 제안한 전체 시스템은 DefenseWeaver이다. DefenseWeaver는 차량 내부 컴포넌트의 세부 정보를 기반으로 공격 방법을 동적으로 추론하고 위험 수준을 자동 평가한다.</p>
       <h3>전체 흐름</h3>
       <div class="code-block">1. 자동차 시스템 입력
    └── OpenXSAM++ 기반 구조 데이터 사용 (차량 기능, 구성 요소 정보 포함)
@@ -236,22 +229,25 @@
 
 5. 위험도 평가
    └── 공격 가능성과 영향도를 기반으로 위험 점수 산출 (위험 수준 1~5)</div>
-      <h3>① 구성 표현: OpenXSAM++</h3>
-      <p>시각적 다이어그램을 LLM 기반으로 OpenXSAM++ 형식으로 변환한다. 추출된 논리 경로를 LLM에 직접 공급하면 너무 많은 정보로 품질이 떨어지기 때문에, 각 논리 경로를 노드 간의 관계를 유지하면서 더 작고 관리 가능한 <strong>원자(atom)</strong> 단위로 분해해서 표현한다.</p>
-      <h3>② LLM 기반 공격 방법 추론: 멀티 에이전트</h3>
-      <p>세 개의 전문화된 에이전트가 분업한다. 여러 인공지능이 역할을 분담하는 구조다.</p>
+      <h3>1. 구성 표현 (OpenXSAM++)</h3>
+      <p>기존 차량 시스템은 대부분 시각적 다이어그램 형태로 표현되기 때문에 자동 분석이 어렵다. 이를 해결하기 위해 논문은 자동차 시스템 구조를 OpenXSAM++이라는 구조화된 XML 기반 형식으로 변환하였다.</p>
+      <p>또한 모든 정보를 한 번에 LLM에 입력하면 정보량이 너무 많아 품질이 떨어질 수 있기 때문에, <strong>원자 구조 표현(Atomic Structure Representation)</strong>을 사용한다. 시스템을 더 작은 단위의 원자(atom)로 분해하여 노드 간 관계를 유지하면서도 분석 가능한 수준으로 단순화한다.</p>
+      <h3>2. LLM 기반 공격 방법 추론</h3>
+      <p>DefenseWeaver는 하나의 AI가 모든 작업을 처리하는 것이 아니라, 역할을 나눈 <strong>멀티 에이전트 구조</strong>를 사용한다.</p>
       <ul>
-        <li><strong>Sub-Tree Constructor</strong>: 공격 표면 파악 → 로컬 목표 설정 → 공격 방법 생성 순서로 하위 트리 생성</li>
-        <li><strong>Attack Tree Assembler</strong>: 하위 트리들을 통합하여 완전한 공격 트리를 구성, 논리 일관성 검증</li>
-        <li><strong>Risk Assessor</strong>: ISO/SAE 21434의 5가지 차원으로 공격 실현 가능성 평가, 안전/금전/운영/프라이버시 관점에서 영향도 산정</li>
+        <li><strong>Sub-Tree Constructor:</strong> 개별 컴포넌트에 대한 공격 하위 트리 생성, 특정 공격 목표에 대한 가능한 공격 방법 분석</li>
+        <li><strong>Attack Tree Assembler:</strong> 생성된 하위 트리를 하나의 전체 공격 트리로 조립, 공격 흐름 간 논리 관계를 연결</li>
+        <li><strong>Risk Assessor:</strong> 공격 실현 가능성과 영향도를 평가, ISO/SAE 21434 기준 기반 위험 점수 계산</li>
       </ul>
-      <h3>③ 파인튜닝 및 RAG를 통한 적응</h3>
+      <p>이를 통해 여러 AI가 생성, 조립, 평가 역할을 분담하여 보다 정교한 공격 분석을 수행한다.</p>
+      <h3>3. 적응 전략 (LoRA + RAG)</h3>
+      <p>DefenseWeaver는 진화하는 보안 위협에 대응하기 위해 LoRA 파인튜닝과 RAG를 활용한다.</p>
       <ul>
-        <li><strong>Sub-Tree Constructor → LoRA 파인튜닝</strong>: 자동차 보안 도메인에 맞게 효율적으로 튜닝. 116개의 전문가 큐레이션 TARA 보고서로 학습</li>
-        <li><strong>Risk Assessor → RAG</strong>: 실시간으로 최신 기업 가이드라인과 유사 사례를 검색하여 점수 산정에 참조</li>
+        <li><strong>LoRA:</strong> 자동차 보안 도메인에 맞게 LLM을 효율적으로 튜닝</li>
+        <li><strong>RAG:</strong> 최신 보안 문서와 기업 지식을 검색하여 정확도를 향상</li>
       </ul>
-      <p>이 둘을 나눈 이유가 흥미롭다. RAG를 Constructor에 적용하면 관련 없는 사례가 혼입되어 품질이 오히려 떨어진다는 걸 실험적으로 확인했기 때문이다.</p>
-      <div class="highlight-box">전체적으로 보면 <strong>"자동차 보안 분석 파이프라인을 AI로 자동화한 구조"</strong>라고 볼 수 있다.</div>
+      <p>단순히 고정된 지식만 사용하는 것이 아니라, 새로운 공격 기법과 최신 보안 위협에도 적응 가능하도록 설계되었다.</p>
+      <div class="highlight-box">전체적으로 보면 <strong>"자동차 보안 분석 파이프라인 자체를 AI 기반으로 자동화한 구조"</strong>라고 볼 수 있다.</div>
     </div>
   </div>
 
@@ -261,16 +257,14 @@
       <h2 class="section-title">평가 및 결과 해석</h2>
     </div>
     <div class="section-body">
-      <h3>실차 4대에서의 침투 테스트</h3>
-      <p><strong>차량 A/B (BCM):</strong> 같은 IVI→게이트웨이→BCM 논리 경로지만 공격 방법이 완전히 달랐다.</p>
+      <p>논문은 DefenseWeaver를 실제 차량 프로젝트에 적용하여 검증하였다. 그 결과 총 <strong>11개의 실제 공격 경로</strong>를 발견하였으며, OEM 및 공급업체에 보고되어 실제 패치까지 진행되었다.</p>
+      <p>특히 기존 인간 전문가와 비교했을 때 다음과 같은 장점을 보였다.</p>
       <ul>
-        <li>차량 A: OpenSSL 1.1.0a → CVE-2016-6309 버퍼 오버플로우 악용 → BCM 펌웨어 재프로그래밍 <span class="risk">위험 수준 3</span></li>
-        <li>차량 B: UART 디버그 인터페이스 노출 → Linux 6.1 CVE-2023-0179 권한 상승 → BCM 펌웨어 재프로그래밍 <span class="risk risk-4">위험 수준 4</span></li>
+        <li>새로운 시스템 구성에 대한 높은 적응성</li>
+        <li>비관습적인 공격 시나리오 탐지 가능</li>
+        <li>차량 구성 차이에 따른 세밀한 공격 경로 분석 가능</li>
+        <li>공격 트리 생성 시간 대폭 감소</li>
       </ul>
-      <p>정적 라이브러리 기반 도구였다면 두 차량을 동일하게 취급했을 것이다. DefenseWeaver는 구성 차이를 정확히 반영해 서로 다른 공격 경로를 도출했다.</p>
-      <p><strong>차량 C (CDC/OTA):</strong> TBOX 하드코딩 CA 인증서 발견 → MITM으로 OTA 펌웨어에 악성 코드 주입. 해시 검증 실패해도 업그레이드 진행하는 논리적 결함 확인 <span class="risk risk-4">위험 수준 4</span></p>
-      <p><strong>차량 D (PKES/UWB):</strong> UWB가 중계 공격을 막기 위해 도입되었지만, UWB 레인징 방해 + BLE 중계 조합으로 우회 성공. UWB 자체가 새로운 공격 표면이 된 역설적인 사례 <span class="risk risk-5">위험 수준 5</span></p>
-      <p>총 11개의 공격 경로가 PoC로 검증되었고, 모두 해당 OEM/공급업체에 책임 있게 공개하여 패치 완료되었다.</p>
       <h3>인간 전문가 7인과의 비교</h3>
       <div class="table-wrap">
         <table>
@@ -287,7 +281,9 @@
           </tbody>
         </table>
       </div>
-      <p>모든 6개 시나리오에서 자동 생성 공격 트리의 평가 지표 점수가 더 높았다. 특히 참신성이 105% 높다는 점이 인상적이다. 인간 전문가는 경험 밖의 공격을 생각하기 어렵고, 비슷해 보이는 시나리오에서 세밀한 구성 차이를 놓치는 경향이 있었다. DefenseWeaver는 이 두 약점을 정확히 보완했다.</p>
+      <p>모든 6개 시나리오에서 자동 생성 공격 트리의 평가 지표 점수가 더 높았으며, 특히 참신성이 105% 높다는 점이 인상적이다.</p>
+      <p>특히 차량 B 사례에서 UART 기반 공격 경로를 발견한 부분은 인간 전문가들이 놓쳤던 비정형 공격 벡터를 AI가 탐지했다는 점에서 의미가 크다고 느꼈다.</p>
+      <p>인간 전문가는 자신의 경험 밖에 있는 공격을 생각하기 어렵고, 비슷해 보이는 시나리오에서 세밀한 구성 차이를 놓치는 경향이 있었다. DefenseWeaver는 이 두 약점을 정확히 보완했다.</p>
     </div>
   </div>
 
@@ -297,12 +293,9 @@
       <h2 class="section-title">한계점</h2>
     </div>
     <div class="section-body">
-      <ul>
-        <li><strong>위협 시나리오는 여전히 사람이 정의한다.</strong> 진입점과 끝점 설정은 여전히 인간의 몫이다. STRIDE 프레임워크와 통합하는 방향을 제안했지만 아직 구현은 아니다.</li>
-        <li><strong>LLM 비용과 확장성 문제.</strong> 3개월간 3억 토큰 소비. 소규모 부품 공급업체에게 이 비용 구조가 현실적인지는 별도 논의가 필요하다.</li>
-        <li><strong>소스 코드 비공개.</strong> 상용 플랫폼 탑재로 인해 전체 코드가 공개되지 않아 재현 가능성이 제한적이다.</li>
-        <li><strong>공격 트리의 형식적 정확성 보장이 없다.</strong> 논문 자체에서도 인정하듯, 공격 트리의 올바름을 수학적으로 검증하는 것은 아직 열린 문제다.</li>
-      </ul>
+      <p><strong>첫 번째,</strong> 아직 완전한 자동화가 아니라는 점이다. 공격 경로 생성과 위험 평가 자체는 자동화되었지만, 초기 위협 시나리오 정의는 여전히 사람이 직접 수행해야 한다. 즉 인간 전문가의 개입 없이 완전한 AI 기반 TARA라고 보기에는 아직 어려운 부분이 존재한다.</p>
+      <p><strong>두 번째,</strong> 비용 문제이다. 실제 산업 환경에서 3개월 동안 약 3억 개의 토큰을 사용했다. 대규모 OEM 환경에서는 가능할 수 있지만, 소규모 공급업체 입장에서는 비용 부담이 상당할 수 있다.</p>
+      <p><strong>세 번째,</strong> LLM 특성상 잘못된 추론(Hallucination) 가능성이 존재한다. 따라서 실제 산업 적용에서는 전문가 검증 과정이 여전히 중요할 것으로 보인다.</p>
     </div>
   </div>
 
@@ -313,7 +306,8 @@
     </div>
     <div class="section-body">
       <p>자동차 보안 위험 분석인 TARA가 현재는 사람이 주도하고 인공지능이 보조하는 형태로 이루어지고 있어 100% 인공지능이 분석해주지는 않는다. 이 논문은 인공지능을 최대한 활용함으로써 사람이 할 수 있는 한계를 극복하고자 하는 시도를 보여준다.</p>
-      <p>다만 위험 시나리오를 설계하는 영역은 인간이 담당하고 있어, 완벽히 인공지능이 다 했다고는 볼 수 없는 점이 아쉽다. 그럼에도 굉장히 흥미로웠던 점은 <strong>실제 차량에서의 공격 경로를 발견하고 패치까지 진행해서 실무 적용 가능성이 높다는 점을 직접 보여준 것</strong>이다. 이론으로만 그친 것이 아니라 현대 차량에서 진짜 취약점을 찾아냈다는 점에서, 완전한 자동화까지 머지않았다는 느낌을 받을 수 있었다.</p>
+      <p>다만 이 논문에서도 위험 시나리오를 설계하는 영역은 인간이 담당하고 있어, 완벽히 인공지능이 다 했다고는 볼 수 없는 점이 아쉽다.</p>
+      <p>그럼에도 굉장히 흥미로웠던 점은 <strong>실제 차량에서의 공격 경로를 발견하고 패치까지 진행해서 실무 적용 가능성이 높다는 점을 직접 보여준 것</strong>이다. 이론으로만 그친 것이 아니라 현대 차량에서 진짜 취약점을 찾아냈다는 점에서, 완전한 자동화까지 머지않았다는 느낌을 받을 수 있었다.</p>
       <p>어떻게 보면 기존 방식의 반대 방향을 보여준 셈이다. 기존이 사람이 경험을 기반으로 라이브러리를 만들고 거기서 위협을 골라오는 방식이었다면, 이 논문은 컴포넌트 정보를 주면 LLM이 알아서 위협을 생성하는 방향으로 완전히 뒤집었다.</p>
       <p>개인적으로 처음 자율주행차 보안 플랫폼을 설계할 때, 데이터 파이프라인에 실시간 탐지층을 추가하는 방식으로 외부 위협을 막는 데 초점을 맞췄다. 이 논문을 읽고 나서는 탐지 이전 단계, 즉 <strong>설계 단계에서 어떤 공격이 들어올 수 있는지를 미리 분석하는 것</strong>이 얼마나 중요한지를 더 실감하게 되었다. 두 접근이 서로 보완적인 관계라는 것도 느꼈다.</p>
     </div>
@@ -322,20 +316,16 @@
   <div class="section">
     <div class="section-header">
       <div class="section-icon">🚀</div>
-      <h2 class="section-title">앞으로 해볼 것</h2>
+      <h2 class="section-title">앞으로 해볼 것 / 확장 가능성</h2>
     </div>
     <div class="section-body">
-      <h3>더 읽어볼 논문</h3>
+      <p>이 논문은 자동차 분야를 대상으로 하고 있지만, 실제로 논문 내부에서도 드론(UAV)과 선박 항법 시스템(ECDIS)에 적용 가능함을 보여주었다. 따라서 향후에는 다양한 사이버-물리 시스템(CPS)에도 확장 가능성이 크다고 생각한다.</p>
       <ul>
-        <li><strong>CarVal</strong> (IEEE S&P 2024): 데이터로그 기반 자동차 TARA 자동화의 현재 기준선. DefenseWeaver가 직접 비교하는 선행 연구이므로 차이를 비교하며 읽으면 좋을 것 같다.</li>
-        <li><strong>SoK: Rethinking Sensor Spoofing Attacks Against Robotic Vehicles</strong> (EuroS&P 2023): DefenseWeaver의 UAV 사례에서 참조한 논문으로, 자율주행 센서 공격을 체계적으로 분류한 연구다.</li>
+        <li><strong>의료 분야:</strong> MRI, 환자 모니터링 시스템, IoT 의료기기 등이 서로 연결되어 있기 때문에 의료 데이터 유출이나 장비 오작동 위험을 사전에 분석할 수 있을 것이다.</li>
+        <li><strong>스마트시티 및 교통 시스템:</strong> 신호등, CCTV, 교통 관제 시스템 등의 연결 구조를 기반으로 대규모 보안 사고 가능성을 분석할 수 있다.</li>
       </ul>
-      <h3>다른 분야에 적용할 가능성</h3>
-      <p>이 논문에서도 드론(UAV)과 선박 항법 시스템에 적용했으므로, 더 나아가 <strong>의료기기</strong>와 <strong>교통 시스템</strong>에서도 적용할 수 있다고 생각한다. MRI, 환자 모니터링 시스템, IoT 의료기기 등이 서로 연결되어 있어 의료 데이터 유출이나 장비 오작동 가능성을 사전에 분석하는 데 활용 가능하고, 교통 시스템도 신호등·CCTV 등 도시 인프라와 연결되어 있어 대규모 보안 사고를 예방할 수 있을 것이다.</p>
-      <h3>연구/프로젝트로 발전시킨다면</h3>
-      <p>내가 설계했던 자율주행차 센서 로그 보안 플랫폼은 데이터가 들어오기 전에 실시간으로 탐지하는 구조였다. 이 논문을 읽고 나서 한 가지 아이디어가 생겼다.</p>
-      <p><strong>DefenseWeaver가 생성한 공격 트리를 CAN 버스 IDS(침입 탐지 시스템) 탐지 룰셋으로 자동 변환하는 파이프라인</strong>을 구현해보고 싶다. 공격 트리의 각 리프 노드에서 네트워크 레벨의 특징을 추출하고, 이를 탐지 룰로 변환하면 TARA(공격 분석) → IDS 룰(실시간 탐지)의 파이프라인이 자동화된다. 설계 단계의 보안 분석과 운영 단계의 실시간 탐지가 자연스럽게 연결되는 구조다.</p>
-      <p>결과적으로 인공지능 기반 보안 자동화 기술이 앞으로 자동차뿐 아니라 다양한 산업 전반의 핵심 보안 기술로 발전할 수 있음을 이번 논문을 통해 다시 한번 실감했다.</p>
+      <p>개인적으로는 이 논문의 구조를 자율주행 데이터 파이프라인 보안 연구와 결합해보고 싶다는 생각이 들었다. 기존에는 데이터 위조 탐지를 중심으로 접근했다면, 앞으로는 <strong>차량 내부 네트워크와 ECU 단위 공격 흐름까지 함께 분석하는 방향</strong>으로 확장하면 더 강력한 자율주행 보안 시스템을 설계할 수 있을 것이라고 생각한다.</p>
+      <p>결과적으로 AI 기반 보안 자동화 기술은 앞으로 자동차뿐 아니라 다양한 산업 전반의 핵심 보안 기술로 발전할 가능성이 매우 크다고 느꼈다.</p>
     </div>
   </div>
 
