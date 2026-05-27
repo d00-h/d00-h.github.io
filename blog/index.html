@@ -84,6 +84,7 @@
       transform: translateY(-6px);
       box-shadow: 0 20px 50px rgba(0,0,0,.4), 0 0 0 1px rgba(56,189,248,.2);
     }
+    .card.new { border-color: rgba(56,189,248,.35); }
 
     .thumb {
       height: 160px;
@@ -103,6 +104,14 @@
       position: absolute; bottom: 0; left: 0; right: 0;
       height: 60px;
       background: linear-gradient(to top, var(--card), transparent);
+    }
+
+    .new-badge {
+      position: absolute; top: 12px; left: 12px; z-index: 2;
+      font-size: .65rem; font-weight: 700; letter-spacing: 2px;
+      padding: 3px 10px; border-radius: 99px;
+      background: linear-gradient(135deg, var(--cyan2), var(--teal));
+      color: #070d1a; text-transform: uppercase;
     }
 
     .card-body { padding: 20px 22px 24px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
@@ -259,6 +268,26 @@
             <span class="card-tag">Linux</span>
             <span class="card-tag">CTF</span>
             <span class="card-tag">Wargame</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-arrow">→</div>
+    </a>
+
+    <a href="/blog/ids-ips.html" class="card new">
+      <div class="thumb">🛡️
+        <span class="new-badge">NEW</span>
+      </div>
+      <div class="card-body">
+        <p class="card-cat">블로그 / 기술문서</p>
+        <h2 class="card-title">IDS/IPS의 원리와 활용 방법</h2>
+        <p class="card-desc">침입 탐지·방지 시스템의 동작 원리, 유형(NIDS/HIDS/NIPS/HIPS/WIPS), 장단점, 차이점, 활용 사례까지 정리.</p>
+        <div class="card-footer">
+          <span class="card-date">2026. 05. 27</span>
+          <div class="card-tags">
+            <span class="card-tag">IDS</span>
+            <span class="card-tag">IPS</span>
+            <span class="card-tag">네트워크보안</span>
           </div>
         </div>
       </div>
