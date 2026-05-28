@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>정부 온나라·GPKI 인증서 유출 사건 분석 | d00-h</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #0a0f1e;
+      --bg-card:   #0f1629;
+      --bg-term:   #111827;
+      --border:    #1e2d4a;
+      --cyan:      #00d4ff;
+      --cyan-dim:  #00a8cc;
+      --cyan-glow: rgba(0, 212, 255, 0.12);
+      --text:      #e2e8f0;
+      --muted:     #8899aa;
+      --tag-bg:    rgba(0, 212, 255, 0.08);
+      --warn:      #f59e0b;
+      --danger:    #ef4444;
+      --green:     #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      line-height: 1.8;
+      font-size: 1rem;
+    }
+
+    .post-header {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 80px 24px 48px;
+    }
+
+    .breadcrumb {
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .breadcrumb span { color: var(--cyan); }
+
+    .post-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .tag {
+      background: var(--tag-bg);
+      border: 1px solid rgba(0,212,255,0.2);
+      color: var(--cyan);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 4px;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.2;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    h1 .accent { color: var(--cyan); }
+
+    .post-meta {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+    .post-meta span::before { content: '· '; }
+    .post-meta span:first-child::before { content: ''; }
+
+    .summary-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--cyan);
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-bottom: 56px;
+    }
+    .summary-card .label {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 10px;
+    }
+    .summary-card p { color: var(--text); font-size: 0.95rem; line-height: 1.75; }
+
+    .post-body {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 24px 100px;
+    }
+
+    .section { margin-bottom: 64px; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .section-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--cyan);
+      background: var(--tag-bg);
+      border: 1px solid rgba(0,212,255,0.2);
+      padding: 3px 9px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    p { color: var(--text); margin-bottom: 16px; font-size: 0.97rem; }
+    p:last-child { margin-bottom: 0; }
+
+    /* 인라인 용어 툴팁 */
+    .term {
+      display: inline-block;
+      background: rgba(0,212,255,0.07);
+      border-bottom: 1px dashed var(--cyan-dim);
+      color: var(--cyan);
+      font-weight: 500;
+      padding: 0 3px;
+      border-radius: 3px;
+      cursor: help;
+      position: relative;
+    }
+    .term::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #162032;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 0.78rem;
+      font-weight: 400;
+      line-height: 1.5;
+      padding: 8px 12px;
+      border-radius: 6px;
+      white-space: normal;
+      width: 230px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 10;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    }
+    .term:hover::after { opacity: 1; }
+
+    /* 용어 설명 박스 */
+    .tip-box {
+      background: var(--bg-term);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--cyan-dim);
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 12px 0 20px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .tip-box strong { color: var(--cyan); font-weight: 600; }
+    .tip-icon {
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--cyan-dim);
+      font-weight: 700;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    /* 타임라인 */
+    .timeline {
+      position: relative;
+      padding-left: 32px;
+      margin: 24px 0;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 9px; top: 6px; bottom: 6px;
+      width: 1px;
+      background: var(--border);
+    }
+    .tl-item {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: -23px; top: 7px;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+    }
+    .tl-date {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--cyan);
+      margin-bottom: 3px;
+    }
+    .tl-item p { margin-bottom: 0; font-size: 0.92rem; }
+
+    /* 강조 카드 */
+    .highlight-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin: 20px 0;
+    }
+    .highlight-card.danger { border-left: 3px solid var(--danger); }
+    .highlight-card.warn   { border-left: 3px solid var(--warn); }
+    .highlight-card.green  { border-left: 3px solid var(--green); }
+    .highlight-card.cyan   { border-left: 3px solid var(--cyan); }
+
+    .highlight-card .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .highlight-card.danger .card-title { color: var(--danger); }
+    .highlight-card.warn   .card-title { color: var(--warn); }
+    .highlight-card.green  .card-title { color: var(--green); }
+    .highlight-card.cyan   .card-title { color: var(--cyan); }
+    .highlight-card p { font-size: 0.9rem; margin-bottom: 0; }
+
+    /* 대응 그리드 */
+    .response-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .response-item {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .response-item .ri-phase {
+      background: var(--tag-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 10px;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-align: center;
+      color: var(--cyan);
+      text-transform: uppercase;
+      border-right: 1px solid var(--border);
+    }
+    .response-item .ri-content {
+      padding: 14px 18px;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: var(--text);
+    }
+    .response-item .ri-content strong {
+      color: #fff;
+      font-weight: 500;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    /* 비교 테이블 */
+    .alt-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 0.87rem;
+    }
+    .alt-table th {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      text-align: left;
+    }
+    .alt-table td {
+      padding: 12px 12px;
+      border-bottom: 1px solid rgba(30,45,74,0.6);
+      vertical-align: top;
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .alt-table tr:last-child td { border-bottom: none; }
+    .alt-table td:first-child {
+      white-space: nowrap;
+      color: var(--cyan);
+      font-family: 'Syne', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .alt-table .ok  { color: var(--green); font-weight: 700; }
+    .alt-table .no  { color: var(--danger); font-weight: 700; }
+
+    /* 결론 */
+    .conclusion {
+      background: linear-gradient(135deg, rgba(0,212,255,0.04) 0%, transparent 60%);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--cyan);
+      border-radius: 8px;
+      padding: 28px 32px;
+      margin-top: 64px;
+    }
+    .conclusion .label {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 14px;
+    }
+    .conclusion p { font-size: 0.95rem; color: var(--text); margin-bottom: 14px; }
+    .conclusion p:last-child { margin-bottom: 0; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 48px 0;
+    }
+
+    @media (max-width: 600px) {
+      .post-header, .post-body { padding-left: 16px; padding-right: 16px; }
+      .response-item { grid-template-columns: 1fr; }
+      .response-item .ri-phase { border-right: none; border-bottom: 1px solid var(--border); padding: 8px 16px; justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<header class="post-header">
+  <p class="breadcrumb">Blog &nbsp;/&nbsp; <span>Security Case Study</span></p>
+
+  <div class="post-tags">
+    <span class="tag">사고 분석</span>
+    <span class="tag">APT</span>
+    <span class="tag">국가 인프라</span>
+    <span class="tag">2025</span>
+  </div>
+
+  <h1>정부 온나라·GPKI<br/><span class="accent">인증서 유출 사건</span> 분석</h1>
+
+  <div class="post-meta">
+    <span>2022.09 ~ 2025.07 침해</span>
+    <span>보안 사고 분석</span>
+    <span>APT / 국가 인프라</span>
+  </div>
+
+  <div class="summary-card">
+    <div class="label">📌 한 줄 요약</div>
+    <p>
+      북한 배후로 추정되는 APT 그룹이 공무원 원격근무 시스템(G-VPN)의 단순한 인증 구조를 악용해
+      <strong>약 3년간</strong> 정부 핵심 업무망에 무단 접속했다.
+      <strong>GPKI 인증서 2,800건</strong>이 유출됐으며,
+      정부는 해킹 사실을 3년간 인지하지 못하다가
+      미국 보안 매거진 <strong>프랙(Phrack)</strong> 보고서 공개로 세상에 알려졌다.
+    </p>
+  </div>
+</header>
+
+<!-- 본문 -->
+<main class="post-body">
+
+  <!-- ① 사고 원인 -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2>사고 원인</h2>
+    </div>
+
+    <p>
+      이 사건은 단순한 해킹 실수가 아니라, 공공 인프라의 <strong>구조적 허점</strong>을 APT 그룹이
+      장기간 조용히 파고든 사례다. 원인은 크게 세 층위로 나뉜다.
+    </p>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-date">2022년 9월</div>
+        <p>
+          <span class="term" data-tip="APT: Advanced Persistent Threat. 특정 목표를 향해 장기간 은밀하게 침투하는 고도화된 지속 위협. 주로 국가 배후 해킹 조직이 수행한다">APT</span>
+          그룹이 G-VPN 원격접속 환경을 통해 온나라 시스템 최초 침투 시작
+        </p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2022 ~ 2025 (약 3년)</div>
+        <p>정상 공무원 계정으로 위장해 온나라 문서 열람 지속 — 탐지 전혀 없음</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2025년 7월</div>
+        <p>국정원이 이상 징후 인지 — 그러나 침입 경로·피해 규모 파악 불가</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2025년 8월</div>
+        <p>
+          미국 보안 매거진
+          <span class="term" data-tip="프랙(Phrack): 1985년 창간된 세계 최고 권위의 해킹·보안 기술 매거진. 여기에 실린다는 건 보안계에서 매우 공신력 있는 공개라는 의미다">프랙(Phrack)</span>
+          이 'APT Down – The North Korea Files' 보고서 공개 → 전 세계에 알려짐
+        </p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2025년 10월</div>
+        <p>국회 국감에서 공식 확인 — 정부는 "우리가 먼저 알았다"고 해명했지만 3년 무탐지 사실은 변하지 않음</p>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <span class="tip-icon">💡 용어 설명 — GPKI란?</span>
+      <strong>GPKI(Government Public Key Infrastructure)</strong>는 공무원의 공인인증서 같은 개념이다.
+      공무원이 온나라, G-VPN 등 정부 시스템에 접속할 때 "나는 진짜 공무원이다"를 증명하는 <strong>디지털 신분증</strong>이다.
+      이게 탈취되면 해커가 해당 공무원인 척 정부 내부망에 자유롭게 접속할 수 있다.
+    </div>
+
+    <div class="highlight-card danger">
+      <div class="card-title">⚠ 핵심 원인 1 — G-VPN 인증 구조의 단순함</div>
+      <p>
+        공무원 약 6만 3천 명이 원격근무 시 사용하는
+        <span class="term" data-tip="G-VPN: 공무원이 외부에서 정부 내부망에 접속할 때 쓰는 가상사설망. 집이나 외부에서도 사무실처럼 정부 시스템을 쓸 수 있게 해준다">G-VPN</span>의
+        인증 단계가 지나치게 단순하게 설계됐다. GPKI 인증서 하나만 있으면 접속 가능한 구조였기 때문에,
+        인증서만 탈취하면 해커도 정상 공무원처럼 로그인할 수 있었다.
+      </p>
+    </div>
+
+    <div class="highlight-card danger">
+      <div class="card-title">⚠ 핵심 원인 2 — 단일 인증 체계 의존 (Single Point of Failure)</div>
+      <p>
+        GPKI 인증서 하나가 통일부·외교부·조달청·농협·우리은행·신한은행 등
+        수십 개 기관 직원 계정 접근을 가능하게 했다.
+        <span class="term" data-tip="Single Point of Failure: 단일 실패 지점. 시스템에서 이 하나만 망가지면 전체가 무너지는 취약한 구조를 말한다">단일 실패 지점(SPOF)</span>
+        이 국가 핵심 인프라 전체에 걸쳐 있었던 셈이다.
+      </p>
+    </div>
+
+    <div class="highlight-card danger">
+      <div class="card-title">⚠ 핵심 원인 3 — 배후: 김수키(Kimsuky) 추정 APT</div>
+      <p>
+        고려대 정보보호대학원 분석에 따르면 이 공격은 북한 배후 해킹 그룹
+        <span class="term" data-tip="김수키(Kimsuky): 북한 정찰총국 산하 APT 그룹. 정부기관·싱크탱크·언론사 등을 주요 타깃으로 스피어피싱과 장기 잠복 침투를 전문으로 한다">김수키(Kimsuky)</span>
+        소행으로 추정된다. 단순 정보 탈취를 넘어 중국 APT 집단과 도구·기술을 공유한 정황도 발견됐다.
+      </p>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ② 대응 방법 -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2>대응 방법</h2>
+    </div>
+
+    <p>정부가 실제로 취한 대응을 시간 순서대로 정리했다.</p>
+
+    <div class="response-grid">
+      <div class="response-item">
+        <div class="ri-phase">2025년 8월</div>
+        <div class="ri-content">
+          <strong>유효 인증서 즉시 폐기</strong>
+          유효기간이 남아있는 인증서 3명 분을 즉시 폐기. 대부분은 이미 만료된 상태였음
+        </div>
+      </div>
+      <div class="response-item">
+        <div class="ri-phase">조사 진행</div>
+        <div class="ri-content">
+          <strong>국정원·행안부 합동 조사 착수</strong>
+          그러나 침입 경로와 피해 영향도는 "조사 중"으로만 답변 — 끝까지 명확히 밝혀지지 않음
+        </div>
+      </div>
+      <div class="response-item">
+        <div class="ri-phase">2025년 10월</div>
+        <div class="ri-content">
+          <strong>GPKI → 생체인증 전면 전환 발표</strong>
+          행안부가 지문·홍채 등 생체 기반 모바일 공무원증으로 인증 체계를 전환하겠다고 발표.
+          전환 비용만 500억 원 이상
+        </div>
+      </div>
+      <div class="response-item">
+        <div class="ri-phase">제도적</div>
+        <div class="ri-content">
+          <strong>전 중앙부처·지자체 인증서 공유 금지 통보</strong>
+          공무원 간 GPKI 인증서 공유를 즉시 금지하고 관리 강화 지침 배포
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ③ 보안 문제점 -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2>보안 문제점</h2>
+    </div>
+
+    <p>대응 자체보다 <em>왜 이 지경까지 왔는가</em>가 더 중요한 사건이다.</p>
+
+    <div class="highlight-card warn">
+      <div class="card-title">🔴 문제점 1 — 3년간 완전 무탐지</div>
+      <p>
+        해커가 2022년 9월부터 2025년 7월까지 약 3년간 정부 내부망을 드나들었는데
+        단 한 번의 알림도 없었다. 국정원 스스로
+        <strong>"정상적인 경로로 은밀히 진행되는 해킹 징후를 포착하는 데 어려움이 있다"</strong>고 인정했다.
+        <span class="term" data-tip="IDS: Intrusion Detection System. 네트워크나 시스템에서 침입 시도를 탐지해 관리자에게 알려주는 시스템. 차단은 못하고 탐지만 한다">IDS</span>나
+        <span class="term" data-tip="IPS: Intrusion Prevention System. IDS에서 한 단계 나아가 침입을 탐지하면 자동으로 차단까지 수행하는 시스템">IPS</span>
+        같은 기본 탐지 체계가 없거나 무력했다는 증거다.
+      </p>
+    </div>
+
+    <div class="tip-box">
+      <span class="tip-icon">💡 용어 설명 — IDS vs IPS</span>
+      <strong>IDS(침입 탐지 시스템)</strong>는 CCTV처럼 이상한 일이 생기면 <strong>알려주는</strong> 역할,
+      <strong>IPS(침입 방지 시스템)</strong>는 경비원처럼 이상한 일이 생기면 <strong>막아주는</strong> 역할이다.
+      이 사건에서는 해커가 "정상 공무원 계정"을 써서 들어왔기 때문에
+      IDS/IPS가 있어도 "정상 접속"으로 인식해 탐지하기 어려운 구조였다.
+      그래서 행동 패턴으로 탐지하는 <strong>UEBA</strong>가 필요했던 것이다.
+    </div>
+
+    <div class="highlight-card warn">
+      <div class="card-title">🔴 문제점 2 — 탐지했지만 경로·피해 규모 파악 불가</div>
+      <p>
+        국정원이 2025년 7월에 인지했다고 했지만, 어디서 어떻게 들어왔는지,
+        얼마나 털렸는지는 끝내 명확히 발표하지 못했다.
+        <span class="term" data-tip="포렌식(Forensics): 사이버 범죄나 침해 사고 발생 후 증거를 수집·분석해 원인과 경로를 밝히는 기술. 디지털 법의학이라고도 한다">포렌식</span>
+        역량과 로그 보존 체계가 충분하지 않았다는 의미다.
+      </p>
+    </div>
+
+    <div class="highlight-card warn">
+      <div class="card-title">🔴 문제점 3 — 사후 복구도 불완전</div>
+      <p>
+        GPKI의 일부는 복구됐지만 서버 간 통신 암호화, 데이터 암호화 등
+        백엔드 전체가 복원되지 않은 상태에서 서비스를 재개했다.
+        복구가 아니라 <strong>구멍 난 채 재가동</strong>한 것과 다름없었다.
+      </p>
+    </div>
+
+    <div class="highlight-card warn">
+      <div class="card-title">🔴 문제점 4 — 공공기관 보안 사고 공개 의무 부재</div>
+      <p>
+        민간 기업은 개인정보보호법상 침해 인지 후 72시간 내 신고 의무가 있다.
+        반면 공공기관은 이 기준이 느슨하다. 3년간 해킹당하고 한 달 넘게 국민에게 알리지 않은 이유 중 하나다.
+      </p>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ④ 다른 대응방법 -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2>다른 대응 방법이 있었다면?</h2>
+    </div>
+
+    <p>이 사고는 기술적으로 충분히 더 빨리 탐지하거나 예방할 수 있었다.</p>
+
+    <table class="alt-table">
+      <thead>
+        <tr>
+          <th>시점</th>
+          <th>대안 / 보완책</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>사전 예방</td>
+          <td>
+            <strong>MFA(다중 인증) 의무화</strong><br/>
+            <span class="term" data-tip="MFA: Multi-Factor Authentication. 비밀번호 외에 OTP·생체인증 등 추가 인증을 요구하는 방식. 인증서 하나가 탈취돼도 접속 불가능하게 만든다">MFA</span>를
+            G-VPN 접속에 적용했다면 인증서 하나가 탈취돼도 접속이 불가능했다.
+            생체인증 전환보다 훨씬 빠르고 저렴하게 적용 가능한 방어였다.
+          </td>
+        </tr>
+        <tr>
+          <td>사전 예방</td>
+          <td>
+            <strong>UEBA 도입 — 행동 패턴 기반 탐지</strong><br/>
+            <span class="term" data-tip="UEBA: User and Entity Behavior Analytics. 사용자의 평소 행동 패턴을 학습해 비정상적인 접속 시간, 대량 문서 열람 등을 자동 탐지하는 보안 기술">UEBA</span>가
+            있었다면 "야간에 갑자기 수백 건의 문서 조회"같은 이상 행동을 3년이 아니라
+            수 시간~수 일 내에 잡아낼 수 있었다.
+            IDS/IPS가 시그니처(알려진 공격 패턴)에 의존하는 것과 달리,
+            UEBA는 <strong>정상 계정의 비정상 행동</strong>도 탐지한다.
+          </td>
+        </tr>
+        <tr>
+          <td>사전 예방</td>
+          <td>
+            <strong>네트워크 세분화 (Network Segmentation)</strong><br/>
+            GPKI 하나로 통일부·외교부·은행 등 수십 곳을 모두 접근할 수 있는 구조 자체를 바꿔야 한다.
+            직무별로 접근 가능한 시스템을 분리하면 인증서가 탈취돼도 피해 범위가 제한된다.
+          </td>
+        </tr>
+        <tr>
+          <td>사전 예방</td>
+          <td>
+            <strong>인증서 유효기간 단축 + 자동 갱신</strong><br/>
+            인증서 유효기간을 짧게 설정하면 탈취되더라도 빠르게 무력화된다.
+            자동 갱신 시스템과 함께 적용하면 보안성과 편의성을 동시에 잡을 수 있다.
+          </td>
+        </tr>
+        <tr>
+          <td>사고 직후</td>
+          <td>
+            <strong>침입 경로 파악을 위한 로그 보존 체계 강화</strong><br/>
+            어떻게 들어왔는지 파악조차 못 한 건 로그가 충분히 남아있지 않았기 때문이다.
+            최소 1~2년치 접속 로그를 보존하는 체계가 필요하다.
+          </td>
+        </tr>
+        <tr>
+          <td>제도적</td>
+          <td>
+            <strong>공공기관 침해사고 신고·공개 의무 강화</strong><br/>
+            민간과 동일하게 인지 후 72시간 내 공개 의무를 적용해야 한다.
+            국민의 세금으로 운영되는 시스템인 만큼 투명한 공개가 필수다.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="tip-box" style="margin-top: 24px;">
+      <span class="tip-icon">💡 IDS/IPS vs UEBA — 이 사건에서의 차이</span>
+      <table class="alt-table" style="margin-top: 8px;">
+        <thead>
+          <tr>
+            <th>도구</th>
+            <th>탐지 방식</th>
+            <th>이 사건 적용</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>IDS/IPS</td>
+            <td>알려진 공격 시그니처 매칭</td>
+            <td><span class="no">✕ 정상 계정·정상 경로라 탐지 불가</span></td>
+          </tr>
+          <tr>
+            <td>UEBA</td>
+            <td>평소 행동 패턴과 비교</td>
+            <td><span class="ok">✓ 대량 문서 조회 등 이상 행동 탐지 가능</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 결론 -->
+  <div class="conclusion">
+    <div class="label">💬 느낀 점 / 결론</div>
+    <p>
+      이 사건에서 가장 이해가 안 됐던 건 <strong>"알았는데 왜 대응을 못 했냐"</strong>는 거였다.
+      국정원이 프랙 보고서보다 한 달 앞서 인지했다고 했는데, 그러면 그 한 달 동안 뭘 한 건지 의문이다.
+      결국 알고도 대응하지 못한 이유는 해커가 <strong>정상 공무원 계정으로 정상 경로를 통해</strong>
+      들어왔기 때문이고, 현재 보안관제 시스템으로는 이런 패턴을 잡아낼 수 없었던 것이다.
+    </p>
+    <p>
+      여기서 <strong>IDS/IPS의 한계</strong>가 드러난다. IDS/IPS는 알려진 공격 패턴(시그니처)이 있어야 탐지가 가능한데,
+      이미 탈취된 정상 계정으로 정상 로그인을 하는 건 시그니처 자체가 없다.
+      오탐(False Positive)이 생길 수도 있지만, <strong>UEBA를 병행했다면</strong>
+      "평소에 없던 야간 대량 문서 열람"같은 행동 이상을 훨씬 빠르게 잡아낼 수 있었을 것이다.
+      3년이 아니라 수 주 안에 탐지했을 가능성이 높다.
+    </p>
+    <p>
+      결국 이 사건은 기술 문제이기도 하지만 <strong>구조 문제</strong>다.
+      GPKI 하나로 수십 개 기관에 접근 가능한 설계,
+      이상 행동을 감지할 체계 없이 돌아가는 공공 인프라,
+      뚫려도 국민에게 알리지 않는 문화 — 이 세 가지가 바뀌지 않으면
+      같은 사고는 반복될 수밖에 없다.
+    </p>
+  </div>
+
+</main>
+</body>
+</html>
