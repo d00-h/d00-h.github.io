@@ -173,7 +173,7 @@
     }
     .post-card:hover::before { opacity: 1; }
 
-    /* 피처드 카드 (가로 꽉 차게) */
+    /* 피처드 카드 */
     .post-card.featured {
       grid-column: 1 / -1;
       flex-direction: row;
@@ -181,16 +181,9 @@
       gap: 32px;
       padding: 32px;
     }
-    .post-card.featured .card-badge {
-      position: absolute;
-      top: 20px; right: 20px;
-    }
-    .post-card.featured .card-body {
-      flex: 1;
-    }
-    .post-card.featured .card-arrow {
-      align-self: flex-end;
-    }
+    .post-card.featured .card-body { flex: 1; }
+    .post-card.featured .card-arrow { align-self: flex-end; }
+    .post-card.featured .card-title { font-size: 1.3rem; }
 
     .card-meta {
       display: flex;
@@ -202,15 +195,6 @@
       font-size: 0.74rem;
       color: var(--muted2);
       letter-spacing: 0.04em;
-    }
-    .card-dot {
-      width: 3px; height: 3px;
-      border-radius: 50%;
-      background: var(--muted2);
-    }
-    .card-read {
-      font-size: 0.74rem;
-      color: var(--muted2);
     }
 
     .card-tags {
@@ -244,6 +228,11 @@
       background: rgba(167,139,250,0.07);
       border-color: rgba(167,139,250,0.2);
     }
+    .card-tag.red {
+      color: #f87171;
+      background: rgba(248,113,113,0.07);
+      border-color: rgba(248,113,113,0.2);
+    }
 
     .card-title {
       font-family: 'Syne', sans-serif;
@@ -251,9 +240,6 @@
       font-weight: 700;
       color: #fff;
       line-height: 1.35;
-    }
-    .post-card.featured .card-title {
-      font-size: 1.3rem;
     }
 
     .card-desc {
@@ -274,16 +260,11 @@
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #f59e0b;
-      background: rgba(245,158,11,0.08);
-      border: 1px solid rgba(245,158,11,0.2);
-      padding: 2px 8px;
-      border-radius: 3px;
-    }
-    .card-badge.new {
       color: var(--cyan);
       background: var(--tag-bg);
-      border-color: rgba(0,212,255,0.2);
+      border: 1px solid rgba(0,212,255,0.2);
+      padding: 2px 8px;
+      border-radius: 3px;
     }
     .card-arrow {
       font-size: 0.8rem;
@@ -293,21 +274,6 @@
     .post-card:hover .card-arrow {
       color: var(--cyan);
       transform: translateX(3px);
-    }
-
-    /* ── 구분선 레이블 ── */
-    .section-label {
-      max-width: 900px;
-      margin: 8px auto 0;
-      padding: 0 24px;
-    }
-    .section-label span {
-      font-family: 'Syne', sans-serif;
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted2);
     }
 
     /* ── 푸터 ── */
@@ -327,23 +293,13 @@
       color: var(--muted);
     }
     footer .f-logo span { color: var(--cyan); }
-    footer p {
-      font-size: 0.78rem;
-      color: var(--muted2);
-    }
+    footer p { font-size: 0.78rem; color: var(--muted2); }
 
-    /* ── 반응형 ── */
     @media (max-width: 640px) {
       nav { padding: 0 16px; }
       .nav-links { gap: 16px; }
-      .post-card.featured {
-        flex-direction: column;
-        gap: 16px;
-      }
-      .post-grid {
-        grid-template-columns: 1fr;
-        padding: 24px 16px 60px;
-      }
+      .post-card.featured { flex-direction: column; gap: 16px; }
+      .post-grid { grid-template-columns: 1fr; padding: 24px 16px 60px; }
       .page-header { padding: 48px 16px 32px; }
       .filter-bar { padding: 20px 16px 0; }
       footer { padding: 24px 16px; }
@@ -352,7 +308,6 @@
 </head>
 <body>
 
-<!-- ── 네비 ── -->
 <nav>
   <a href="/index.html" class="nav-logo">d<span>00</span>-h</a>
   <ul class="nav-links">
@@ -363,27 +318,25 @@
   </ul>
 </nav>
 
-<!-- ── 페이지 헤더 ── -->
 <div class="page-header">
   <div class="eyebrow">d00-h · Security Blog</div>
   <h1>Blog</h1>
   <p>보안 사고 분석, 논문 리뷰, 학습 기록을 정리합니다.</p>
 </div>
 
-<!-- ── 필터 탭 ── -->
 <div class="filter-bar">
   <button class="filter-btn active" onclick="filterPosts('all', this)">All</button>
   <button class="filter-btn" onclick="filterPosts('incident', this)">사고 분석</button>
   <button class="filter-btn" onclick="filterPosts('paper', this)">논문 리뷰</button>
+  <button class="filter-btn" onclick="filterPosts('dev', this)">개발 / 실습</button>
   <button class="filter-btn" onclick="filterPosts('roadmap', this)">학습 로드맵</button>
   <button class="filter-btn" onclick="filterPosts('career', this)">커리어</button>
 </div>
 
-<!-- ── 포스트 그리드 ── -->
 <div class="post-grid" id="postGrid">
 
   <!-- 피처드: 쿠팡 (최신) -->
-  <a href="./coupang-breach.html" class="post-card featured" data-cat="incident">
+  <a href="./coupang-breach-blog.html" class="post-card featured" data-cat="incident">
     <div class="card-body">
       <div class="card-tags">
         <span class="card-tag">사고 분석</span>
@@ -399,8 +352,63 @@
         <span class="card-date">2025.11 발생</span>
       </div>
     </div>
-    <div style="display:flex; flex-direction:column; align-items:flex-end; justify-content:space-between; gap:16px;">
-      <span class="card-badge new">NEW</span>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;gap:16px;">
+      <span class="card-badge">NEW</span>
+      <span class="card-arrow">→</span>
+    </div>
+  </a>
+
+  <!-- IDS/IPS -->
+  <a href="./ids-ips.html" class="post-card" data-cat="dev">
+    <div class="card-tags">
+      <span class="card-tag green">개발 / 실습</span>
+    </div>
+    <div class="card-title">IDS / IPS 개념 정리 및 실습</div>
+    <div class="card-desc">
+      침입 탐지 시스템(IDS)과 침입 방지 시스템(IPS)의 차이, 동작 원리,
+      실제 실습 내용을 정리했다.
+    </div>
+    <div class="card-footer">
+      <div class="card-meta">
+        <span class="card-date">2025.05</span>
+      </div>
+      <span class="card-arrow">→</span>
+    </div>
+  </a>
+
+  <!-- Bandit Write-up -->
+  <a href="./bandit-write-embed.html" class="post-card" data-cat="dev">
+    <div class="card-tags">
+      <span class="card-tag green">개발 / 실습</span>
+      <span class="card-tag red">CTF</span>
+    </div>
+    <div class="card-title">OverTheWire Bandit Write-up</div>
+    <div class="card-desc">
+      Linux 기초 보안 실습 게임 Bandit 풀이. 파일 권한, SSH, 환경변수,
+      프로세스 등 핵심 개념을 문제별로 정리했다.
+    </div>
+    <div class="card-footer">
+      <div class="card-meta">
+        <span class="card-date">2025.05</span>
+      </div>
+      <span class="card-arrow">→</span>
+    </div>
+  </a>
+
+  <!-- Git Branching -->
+  <a href="./git-branching.html" class="post-card" data-cat="dev">
+    <div class="card-tags">
+      <span class="card-tag green">개발 / 실습</span>
+    </div>
+    <div class="card-title">Git 브랜치 전략 정리</div>
+    <div class="card-desc">
+      Git 브랜치 개념, merge / rebase 차이, 협업 시 브랜치 전략을
+      실습과 함께 정리했다.
+    </div>
+    <div class="card-footer">
+      <div class="card-meta">
+        <span class="card-date">2025.05</span>
+      </div>
       <span class="card-arrow">→</span>
     </div>
   </a>
@@ -425,9 +433,9 @@
   </a>
 
   <!-- 보안 학습 로드맵 -->
-  <a href="./security-roadmap.html" class="post-card" data-cat="roadmap">
+  <a href="./roadmap.html" class="post-card" data-cat="roadmap">
     <div class="card-tags">
-      <span class="card-tag green">학습 로드맵</span>
+      <span class="card-tag orange">학습 로드맵</span>
     </div>
     <div class="card-title">AI 사이버보안 전공자의 2년 학습 로드맵</div>
     <div class="card-desc">
@@ -443,7 +451,7 @@
   </a>
 
   <!-- 커리어 탐색 -->
-  <a href="./career-path.html" class="post-card" data-cat="career">
+  <a href="./career.html" class="post-card" data-cat="career">
     <div class="card-tags">
       <span class="card-tag orange">커리어</span>
     </div>
@@ -462,7 +470,6 @@
 
 </div>
 
-<!-- ── 푸터 ── -->
 <footer>
   <div class="f-logo">d<span>00</span>-h</div>
   <p>© 2025 d00-h · AI Cybersecurity</p>
@@ -470,17 +477,10 @@
 
 <script>
   function filterPosts(cat, btn) {
-    // 버튼 active 상태
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
-    // 카드 필터
     document.querySelectorAll('.post-card').forEach(card => {
-      if (cat === 'all' || card.dataset.cat === cat) {
-        card.style.display = '';
-      } else {
-        card.style.display = 'none';
-      }
+      card.style.display = (cat === 'all' || card.dataset.cat === cat) ? '' : 'none';
     });
   }
 </script>
