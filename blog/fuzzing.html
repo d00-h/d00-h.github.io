@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fuzzing과 Fuzzer 개념— d00-h</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #070d1a; --card: #0d1629; --card2: #111e35;
+      --border: rgba(56,189,248,0.13); --cyan: #38bdf8;
+      --cyan2: #0ea5e9; --teal: #22d3ee; --white: #e8f4fd; --muted: #7a99b8;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; }
+    body::after { content: ''; position: fixed; inset: 0; z-index: 998; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E"); }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-thumb { background: var(--cyan2); border-radius: 99px; }
+
+    .header {
+      padding: 28px 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(7,13,26,0.88); backdrop-filter: blur(20px);
+    }
+    .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; text-decoration: none; color: var(--white); }
+    .logo span { color: var(--cyan); }
+    .back { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--muted); font-size: .9rem; transition: color .2s; }
+    .back:hover { color: var(--cyan); }
+    .back svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    .hero {
+      padding: 70px 60px 50px;
+      position: relative; overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+    .g { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; opacity: .22; }
+    .post-cat { font-size: .72rem; letter-spacing: 4px; color: var(--cyan); text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .post-cat::before { content: ''; width: 24px; height: 1px; background: var(--cyan); }
+    .post-title { font-family: 'Syne', sans-serif; font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800; line-height: 1.15; max-width: 760px; }
+    .post-title em { color: var(--cyan); font-style: normal; }
+    .post-meta { display: flex; align-items: center; gap: 20px; margin-top: 24px; flex-wrap: wrap; }
+    .post-date { font-size: .82rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+    .post-date svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .post-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .post-tag { font-size: .73rem; padding: 4px 12px; border-radius: 99px; border: 1px solid var(--border); color: var(--teal); background: rgba(34,211,238,.06); }
+
+    .content { max-width: 760px; margin: 0 auto; padding: 60px 60px 100px; }
+
+    .intro {
+      font-size: .95rem; color: var(--muted); line-height: 1.9;
+      padding: 20px 24px; border-left: 3px solid var(--cyan);
+      background: rgba(56,189,248,.04); border-radius: 0 12px 12px 0;
+      margin-bottom: 52px;
+    }
+    .intro strong { color: var(--white); font-weight: 500; }
+    .intro a { color: var(--cyan); text-decoration: none; border-bottom: 1px solid rgba(56,189,248,.4); transition: opacity .2s; }
+    .intro a:hover { opacity: .75; }
+
+    .section { margin-bottom: 44px; }
+    .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+    .section-icon {
+      width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--cyan2), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; box-shadow: 0 0 18px rgba(56,189,248,.3);
+    }
+    .section-title { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 700; }
+
+    .section-body {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px 28px;
+      font-size: .95rem; color: var(--muted); line-height: 1.85;
+    }
+    .section-body p { margin-bottom: 14px; }
+    .section-body p:last-child { margin-bottom: 0; }
+    .section-body strong { color: var(--white); font-weight: 500; }
+    .section-body ul { padding-left: 20px; margin: 10px 0 14px; }
+    .section-body ul li { margin-bottom: 8px; }
+    .section-body h3 {
+      font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700;
+      color: var(--white); margin: 22px 0 10px;
+    }
+    .section-body h3:first-child { margin-top: 0; }
+
+    .code-block {
+      background: var(--card2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 18px 22px;
+      font-family: 'Courier New', monospace; font-size: .85rem;
+      color: var(--teal); line-height: 1.9; margin: 14px 0;
+      white-space: pre; overflow-x: auto;
+    }
+
+    .highlight-box {
+      background: rgba(56,189,248,.07); border: 1px solid rgba(56,189,248,.25);
+      border-left: 3px solid var(--cyan); border-radius: 0 10px 10px 0;
+      padding: 14px 20px; margin: 16px 0;
+      font-size: .93rem; color: var(--white); line-height: 1.7;
+    }
+
+    .table-wrap { overflow-x: auto; margin: 16px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    th {
+      background: rgba(56,189,248,.1); color: var(--cyan);
+      padding: 10px 14px; text-align: center; font-weight: 600;
+      border: 1px solid var(--border);
+    }
+    td { padding: 9px 14px; text-align: center; border: 1px solid var(--border); color: var(--muted); }
+    td:first-child { text-align: left; color: var(--white); }
+    tr.hl td { color: var(--white); background: rgba(56,189,248,.05); }
+    tr.hl td:first-child { color: var(--cyan); }
+
+    @media (max-width: 700px) {
+      .header { padding: 20px 24px; }
+      .hero { padding: 50px 24px 36px; }
+      .content { padding: 40px 24px 60px; }
+      .code-block { white-space: pre-wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a href="/" class="logo">d00<span>-h</span></a>
+  <a href="/blog/" class="back">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    블로그로
+  </a>
+</header>
+
+<section class="hero">
+  <div class="g" style="width:400px;height:400px;background:radial-gradient(circle,#0369a1,transparent);top:-100px;right:-60px;"></div>
+  <div class="g" style="width:250px;height:250px;background:radial-gradient(circle,#0e7490,transparent);bottom:-60px;left:10%;"></div>
+  <p class="post-cat">블로그 / 개발·실습 문서</p>
+  <h1 class="post-title">Fuzzing과 Fuzzer — <em>개념 및 차이점</em></h1>
+  <div class="post-meta">
+    <span class="post-date">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      2025. 06
+    </span>
+    <div class="post-tags">
+      <span class="post-tag">Fuzzing</span>
+      <span class="post-tag">AFL++</span>
+      <span class="post-tag">Jackalope</span>
+      <span class="post-tag">보안테스트</span>
+      <span class="post-tag">취약점분석</span>
+    </div>
+  </div>
+</section>
+
+<article class="content">
+
+  <p class="intro">
+    퍼징(Fuzzing)은 프로그램에 <strong>무작위·예상치 못한 입력을 자동으로 대량 주입</strong>해 크래시·취약점을 찾는 보안 테스트 기법이다.
+    Fuzzer는 이 과정을 자동으로 수행해주는 도구이며, 현재 <strong>Coverage-Guided Fuzzing</strong>이 업계 표준 방식으로 자리잡았다.
+  </p>
+
+  <!-- 01 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🔍</div>
+      <h2 class="section-title">Fuzzing이란?</h2>
+    </div>
+    <div class="section-body">
+      <p><strong>퍼징(Fuzzing)</strong>은 소프트웨어나 시스템에 <strong>무작위 또는 예상치 못한 데이터를 자동으로 대량 입력</strong>하여, 프로그램이 크래시(비정상 종료)되거나 오류를 일으키는 지점을 찾아 <strong>잠재적인 보안 취약점을 발견하는 테스트 기법</strong>이다.</p>
+      <p>보통 자동화 도구를 활용해 수많은 입력값을 빠르게 주입하고, 그 과정에서 프로그램의 예외 상황이나 보안 취약점을 관찰한다. 하드웨어·소프트웨어 모두에 적용 가능하다.</p>
+      <h3>동작 흐름</h3>
+      <div class="code-block">1. 입력 생성    → 무작위 또는 변형된 데이터 생성
+2. 프로그램 실행 → 타겟 프로그램에 주입
+3. 결과 모니터링 → 크래시 / 오류 / 이상 동작 감지
+4. 반복          → 수백만~수십억 회 자동 반복</div>
+      <h3>왜 쓰냐?</h3>
+      <p>사람이 직접 테스트하면 "정상적인 경우"만 생각하게 된다. 하지만 공격자는 개발자가 전혀 생각 못 한 이상한 입력을 넣는다. Fuzzer는 그 이상한 입력을 <strong>사람 대신 무한히 자동으로</strong> 생성해준다.</p>
+      <h3>특히 효과적인 분야</h3>
+      <ul>
+        <li><strong>보안 (Security):</strong> 신뢰할 수 없는 외부 입력을 처리하는 소프트웨어의 취약점 발견</li>
+        <li><strong>정확성 (Correctness):</strong> 복잡한 두 알고리즘이 동일한 결과를 생성하는지 검증</li>
+        <li><strong>안정성 (Stability):</strong> 복잡한 입력을 처리하는 API가 대량 입력에서도 안정적으로 동작하는지 확인</li>
+      </ul>
+      <div class="highlight-box">개발자는 보통 메모리 누수·버퍼 오버플로 같은 오류를 탐지하는 테스트를 직접 작성하지 않는다. 하지만 이것들이 실제 보안 취약점과 시스템 장애의 주요 원인이 된다. 퍼징은 실제 서비스 환경에서 발생하기 전에 이를 미리 발견할 수 있게 해준다.</div>
+    </div>
+  </div>
+
+  <!-- 02 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">📂</div>
+      <h2 class="section-title">Fuzzing의 종류</h2>
+    </div>
+    <div class="section-body">
+      <p>Fuzzing은 입력 데이터를 어떻게 생성하느냐에 따라 크게 세 가지로 나뉜다.</p>
+      <h3>① Mutation-Based Fuzzing (변이 기반 퍼징)</h3>
+      <p>Dumb Fuzzing이라고도 불린다. 기존 입력 파일(Seed)을 기반으로 랜덤하게 데이터를 변형(Mutate)하여 새로운 테스트 케이스를 생성하는 방식이다.</p>
+      <ul>
+        <li>입력 포맷에 대한 사전 지식이 없어도 됨</li>
+        <li>랜덤하게 바이트를 삽입, 삭제, 치환함</li>
+        <li>구조가 복잡한 파일 포맷에는 잘 작동하지 않지만, 단순한 프로그램이나 에러 핸들링이 약한 코드에서는 효과적</li>
+        <li><strong>대표 도구:</strong> AFL, Radamsa, zzuf</li>
+      </ul>
+      <h3>② Generation-Based Fuzzing (생성 기반 퍼징)</h3>
+      <p>Smart Fuzzing이라고도 불린다. 입력 포맷의 구조(Grammar, Protocol 등)를 이해한 후, 유효하고 의미 있는 입력을 직접 생성하는 방식이다.</p>
+      <ul>
+        <li>파일 포맷, 프로토콜, API 구조 등을 모델링한 후 그에 따라 입력 생성</li>
+        <li>포맷이 까다로운 입력(JSON, PNG, PDF, HTTP 등)에 유리</li>
+        <li>구조화된 입력 덕분에 깊은 코드 경로 탐색 가능</li>
+        <li><strong>대표 도구:</strong> Peach Fuzzer, BooFuzz, Domato(웹용 DOM 퍼저)</li>
+      </ul>
+      <h3>③ Guided-Based Fuzzing (피드백 기반 퍼징)</h3>
+      <p>Coverage-Guided Fuzzing이라고도 불린다. 테스트 실행 후 얻은 커버리지, 경로 정보를 피드백으로 받아 다음 테스트 케이스 생성에 반영하는 방식이다. <strong>현대 퍼저의 표준 방식</strong>으로 자리잡았다.</p>
+      <ul>
+        <li>실행 중 새로운 분기 경로에 도달했는지 여부로 입력을 평가</li>
+        <li>더 많은 커버리지를 확보할 수 있도록 입력을 점진적으로 진화시킴</li>
+        <li>효과적인 취약점 탐지에 매우 유리</li>
+        <li><strong>대표 도구:</strong> AFL++, WinAFL, libFuzzer, Honggfuzz, Syzkaller(커널 퍼징)</li>
+      </ul>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>종류</th><th>별칭</th><th>입력 생성 방식</th><th>특징</th></tr></thead>
+          <tbody>
+            <tr><td>Mutation-Based</td><td>Dumb Fuzzing</td><td>기존 입력 변형</td><td>간단하지만 복잡한 포맷엔 비효율</td></tr>
+            <tr><td>Generation-Based</td><td>Smart Fuzzing</td><td>포맷 모델 기반 생성</td><td>구조적 입력에 강함</td></tr>
+            <tr class="hl"><td>Guided-Based</td><td>Coverage-Guided</td><td>커버리지 피드백 반영</td><td>현재 가장 많이 쓰이는 표준 방식</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>+ 보너스: Sanitizer</h3>
+      <p>Fuzzing과 함께 사용하는 <strong>버그 탐지 보조 도구</strong>다. Fuzzer는 크래시가 발생해야 버그를 발견했다고 판단하는데, 보안상 중요한 버그 중에는 즉시 크래시를 일으키지 않는 경우도 많다. Sanitizer를 함께 사용하면 숨겨진 버그도 크래시로 변환시켜 탐지가 쉬워진다.</p>
+      <ul>
+        <li><strong>AddressSanitizer (ASan):</strong> Use-After-Free, 버퍼 오버플로우 등 메모리 안전성 문제 탐지. Fuzzing 시 거의 필수.</li>
+        <li><strong>UndefinedBehaviorSanitizer (UBSan):</strong> 정수 오버플로우, 잘못 정렬된 포인터 등 정의되지 않은 동작 탐지.</li>
+        <li><strong>MemorySanitizer (MSan):</strong> 초기화되지 않은 메모리 읽기 탐지. 매우 유용하나 설정이 복잡함.</li>
+      </ul>
+      <div class="highlight-box"><strong>핵심:</strong> Fuzzer = 이상한 입력을 던지는 도구 / Sanitizer = 그 입력으로 생긴 숨은 버그까지 잡아주는 도구. 둘을 같이 써야 효과가 극대화된다.</div>
+    </div>
+  </div>
+
+  <!-- 03 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🛠</div>
+      <h2 class="section-title">Fuzzer란?</h2>
+    </div>
+    <div class="section-body">
+      <p><strong>퍼저(Fuzzer)</strong>는 소프트웨어나 시스템의 취약점을 찾기 위해 <strong>무작위, 유효하지 않거나 예기치 않은 데이터를 프로그램의 입력값으로 지속적으로 주입하는 도구</strong>다. 이 과정을 통해 프로그램이 비정상적으로 종료(크래시)되거나 보안 결함이 발생하는지 자동으로 확인한다.</p>
+      <h3>Fuzz Target이란?</h3>
+      <p>Fuzzer가 실제로 입력을 던지는 대상 함수다. <strong>바이트 배열(Byte Array)을 입력받아 테스트 대상 API에 전달</strong>하는 역할을 한다. 퍼징 엔진은 같은 프로세스 안에서 수백만~수십억 번 입력을 반복 실행하기 때문에, Fuzz Target은 아래 조건을 만족해야 효율적으로 동작한다.</p>
+      <h3>좋은 Fuzz Target의 조건</h3>
+      <ul>
+        <li><strong>모든 입력을 처리할 수 있어야 함:</strong> 빈 입력, 매우 큰 입력, 잘못된 입력, 손상된 입력이 들어와도 정상 동작해야 한다.</li>
+        <li><strong>exit() / abort() 사용 금지:</strong> 입력에 의해 이런 함수가 호출되면 버그로 간주된다.</li>
+        <li><strong>결정적(Deterministic)이어야 함:</strong> 같은 입력이면 항상 같은 결과가 나와야 한다. rand() 같은 랜덤 값은 퍼징 효율을 크게 떨어뜨린다.</li>
+        <li><strong>빠르게 실행되어야 함:</strong> 일반 타겟 초당 1,000회 이상 / 가벼운 타겟 초당 10,000회 이상 권장. 초당 10회 이하라면 심각한 성능 문제.</li>
+        <li><strong>전역 상태(Global State) 최소화:</strong> 전역 변수를 수정하면 비결정성을 유발할 수 있어 퍼징 효율이 떨어진다.</li>
+        <li><strong>타겟은 좁을수록 좋음:</strong> JSON, XML, YAML을 하나로 처리하는 것보다 각각 전용 퍼저로 분리하는 것이 훨씬 효율적이다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 04 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">⚖️</div>
+      <h2 class="section-title">Fuzzing vs Fuzzer 차이점</h2>
+    </div>
+    <div class="section-body">
+      <p>Fuzzing과 Fuzzer는 비슷해 보이지만 명확히 다른 개념이다.</p>
+      <h3>Fuzzing</h3>
+      <p>버그를 찾기 위한 <strong>테스트 기법(방법론)</strong> 그 자체다. 프로그램에 수많은 입력값을 자동으로 넣어보면서 크래시(Crash), 메모리 오류, 예외 상황, 보안 취약점을 찾아내는 <strong>과정 전체</strong>를 말한다.</p>
+      <div class="code-block">예시: 웹 브라우저에 수백만 개의 이상한 CSS 입력을 넣어보는 행위 자체가 Fuzzing</div>
+      <h3>Fuzzer</h3>
+      <p><strong>Fuzzing을 수행하는 도구(프로그램)</strong>다. 입력을 생성하고 변형(Mutation)하며 프로그램을 반복 실행하는 소프트웨어다.</p>
+      <div class="code-block">대표적인 Fuzzer: libFuzzer, AFL, AFL++, Honggfuzz</div>
+      <h3>쉽게 비유하면</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>개념</th><th>비유 1</th><th>비유 2</th></tr></thead>
+          <tbody>
+            <tr><td>Fuzzing</td><td>시험 보는 행위</td><td>낚시</td></tr>
+            <tr><td>Fuzzer</td><td>시험 문제를 내는 기계</td><td>낚싯대</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>세 개념의 관계</h3>
+      <div class="code-block">Fuzzer (AFL++, libFuzzer)
+      ↓ 실행
+Fuzz Target (LLVMFuzzerTestOneInput 등)  ← Fuzzer가 입력을 던지는 대상
+      ↓ 반복 테스트
+Fuzzing (입력 생성 → 실행 → 경로 발견 → 변형 → 반복)  ← 버그 탐색 과정 전체</div>
+      <div class="highlight-box"><strong>핵심 한 줄 요약:</strong> Fuzzing은 소프트웨어의 취약점을 찾기 위해 비정상적인 입력을 대량으로 생성하는 <strong>테스트 기법</strong>이며, Fuzzer는 이러한 Fuzzing을 자동으로 수행하는 <strong>도구</strong>다.</div>
+    </div>
+  </div>
+
+  <!-- 05 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🔗</div>
+      <h2 class="section-title">참고 리소스에서 배울 수 있는 것</h2>
+    </div>
+    <div class="section-body">
+      <p>다음 세 가지 링크는 각각 성격이 다르다. 목적에 맞게 활용하면 된다.</p>
+      <h3>⚡ AFL++ (AFLplusplus)</h3>
+      <p><a href="https://github.com/AFLplusplus/AFLplusplus" target="_blank">github.com/AFLplusplus/AFLplusplus →</a></p>
+      <p>Coverage-Guided Fuzzing을 대중화한 AFL의 개선판으로, 현재 가장 활발하게 유지보수되는 Fuzzer다. <strong>실습용 도구 (Linux)</strong></p>
+      <ul>
+        <li>AFL++의 실제 설치 방법과 사용법</li>
+        <li>Coverage-Guided Fuzzing이 실제로 어떻게 동작하는지</li>
+        <li>Mutation 전략 종류 (bitflip, arithmetic, havoc 등)</li>
+        <li>실전 세팅 방법 (타겟 컴파일 → 시드 준비 → 실행)</li>
+      </ul>
+      <h3>🎯 Jackalope</h3>
+      <p><a href="https://github.com/googleprojectzero/Jackalope" target="_blank">github.com/googleprojectzero/Jackalope →</a></p>
+      <p>Google Project Zero(구글 최정예 보안팀)가 만든 Fuzzer. 소스코드 없이 바이너리만으로 Fuzzing 가능하다. <strong>실습용 도구 (Windows/macOS)</strong></p>
+      <ul>
+        <li>소스코드 없이 바이너리 기반으로 Fuzzing하는 방법</li>
+        <li>Windows/macOS 환경에서의 Fuzzing 실습</li>
+        <li>TinyInst 경량 계측(Instrumentation) 라이브러리 동작 원리</li>
+        <li>AFL++과의 아키텍처 차이 비교</li>
+      </ul>
+      <h3>📚 google/fuzzing</h3>
+      <p><a href="https://github.com/google/fuzzing/tree/master" target="_blank">github.com/google/fuzzing/tree/master →</a></p>
+      <p>특정 도구가 아닌 구글이 만든 Fuzzing 튜토리얼·가이드 문서 모음이다. <strong>개념 공부·블로그 작성 시 참고용</strong></p>
+      <ul>
+        <li>Fuzzing 입문 개념 총정리 (intro-to-fuzzing.md)</li>
+        <li>왜 Fuzzing을 해야 하는지 (why-fuzz.md)</li>
+        <li>좋은 Fuzz Target 만드는 방법 (good-fuzz-target.md)</li>
+        <li>libFuzzer 실습 튜토리얼 (tutorial/)</li>
+        <li>Seed Corpus, Dictionary 등 퍼징 효율을 높이는 방법</li>
+      </ul>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>링크</th><th>성격</th><th>추천 활용 시점</th></tr></thead>
+          <tbody>
+            <tr><td>AFL++</td><td>실습용 도구 (Linux)</td><td>Fuzzing 직접 해볼 때</td></tr>
+            <tr><td>Jackalope</td><td>실습용 도구 (Windows/macOS)</td><td>바이너리 분석할 때</td></tr>
+            <tr class="hl"><td>google/fuzzing</td><td>개념·가이드 문서</td><td>개념 공부·블로그 작성할 때</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</article>
+</body>
+</html>
